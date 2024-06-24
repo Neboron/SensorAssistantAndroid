@@ -1,0 +1,478 @@
+<!-- activity_neurosky_details.xml -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ap="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/aperture_term_background"
+    android:padding="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="4dp"
+        android:background="@color/aperture_term_background"
+        android:textColor="@color/aperture_term_main_st">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/returnButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_return_min_orange"
+                android:contentDescription="Return Button"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/deviceName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Device Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/aperture_term_main" />
+
+            <!-- New ImageView for connection status -->
+            <ImageView
+                android:id="@+id/connectionStatusIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Connection Status Icon" />
+
+            <TextView
+                android:id="@+id/deviceAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device Address"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/green_term_main_st" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
+
+        <LinearLayout
+            android:id="@+id/rawPlotDropdownLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/rawPlotDropdownIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/arrow_down_float"
+                ap:tint="@color/aperture_term_main_st"
+                android:contentDescription="Dropdown Icon" />
+
+            <TextView
+                android:id="@+id/rawPlotDropdownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raw Data"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+        </LinearLayout>
+
+        <com.androidplot.xy.XYPlot
+            android:id="@+id/rawPlot"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:visibility="gone"
+            style="@style/MFullScreenGraph.Minimalist.Orange"
+            android:background="@color/aperture_term_background" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.github.mikephil.charting.charts.RadarChart
+                android:id="@+id/brainWavesRadarChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginEnd="100dp"
+                android:background="@color/aperture_term_background"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:layout_marginEnd="10dp"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:translationX="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/brainWavesLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BRAIN WAVES        "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- LOW ALPHA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lowAlphaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOW ALPHA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/lowAlphaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- HIGH ALPHA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/highAlphaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HIGH ALPHA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/highAlphaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- LOW BETA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lowBetaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOW BETA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/lowBetaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- HIGH BETA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/highBetaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HIGH BETA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/highBetaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- LOW GAMA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lowGamaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOW GAMA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/lowGamaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- MID GAMA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/midGamaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MID GAMA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/midGamaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- DELTA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/deltaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DELTA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/deltaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+
+                <!-- THETA -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/thetaLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="THETA: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="8sp" />
+
+                    <TextView
+                        android:id="@+id/thetaVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" "
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="8sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="10dp"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:translationX="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/eyeMonitorLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BLINK MONITOR   "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- BLINK COUNT -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/blinkCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="COUNT: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/blinkCountVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- BLINK INTENSITY -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/blinkIntensity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="INTENSITY: "
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/blinkIntensityVariable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/green_term_main_st"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@android:color/transparent" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <com.androidplot.xy.XYPlot
+                android:id="@+id/recognitionPlot"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                style="@style/MFullScreenGraph.Minimalist.OrangeLabels"
+                android:background="@color/aperture_term_background" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|top"
+                android:background="@drawable/legend_rectangular_contour"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:layout_margin="8dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+
+                    <View
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@color/purple_200"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Attention"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@color/teal_200"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Meditation"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+
+
+        <!-- Add more views for telemetry and settings here -->
+
+    </LinearLayout>
+
+</ScrollView>
+

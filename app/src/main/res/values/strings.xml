@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">AitaVRD</string>
+    <string name="primary_color">Primary color</string>
+    <string name="button">Button</string>
+    <string name="secondary_color">Secondary color</string>
+    <string name="email_icon">email icon</string>
+
+    <string-array name="osc_stream_input_items">
+        <item>DISABLE</item>
+        <item>TSB1F</item>
+        <item>TSB2F</item>
+        <item>TS</item>
+        <item>TB</item>
+    </string-array>
+</resources>

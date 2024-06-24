@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ap="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/aperture_term_background"
+    android:padding="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="4dp"
+        android:background="@color/aperture_term_background"
+        android:textColor="@color/aperture_term_main_st">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/returnButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_return_min_orange"
+                android:contentDescription="Return Button"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/settings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Settings"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/aperture_term_main" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="General"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="NeuroSky Devices"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/neuroSkySwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                ap:trackTint="@color/aperture_term_main_dark"
+                ap:thumbTint="@color/white"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="AitaVRT Devices"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/aitaVrtSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                ap:trackTint="@color/aperture_term_main_dark"
+                ap:thumbTint="@color/white"
+                />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="OSC"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="VRChat OSC Connection"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/oscSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                ap:trackTint="@color/aperture_term_main_dark"
+                ap:thumbTint="@color/white"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="IP"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <EditText
+                android:id="@+id/oscIpEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="Your PC Address"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:inputType="text"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="RX Port"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <EditText
+                android:id="@+id/oscRxPortEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="VRC default port is 9000"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:inputType="number"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="TX Port"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <EditText
+                android:id="@+id/oscTxPortEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="VRC default port is 9001"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:inputType="number"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Messages Sent:"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <TextView
+                android:id="@+id/oscMessagesSentCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/green_term_main_st"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Received:"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/oscMessagesReceivedCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/green_term_main_st"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/oscReconnectButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Reconnect"
+            android:layout_marginTop="8dp"/>
+
+
+
+        <LinearLayout
+            android:id="@+id/oscTestInputsDropdownLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/oscTestInputsDropdownIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/arrow_down_float"
+                ap:tint="@color/aperture_term_main_st"
+                android:contentDescription="Dropdown Icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OSC Test Inputs"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/oscTestInputsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:padding="0dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TSB1F"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <SeekBar
+                    android:id="@+id/oscTestSeekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal"
+                    android:min="0"
+                    android:max="100"
+                    android:thumb="@drawable/aperture_thumb"
+                    android:progressTint="@color/aperture_term_main_st"/>
+            </LinearLayout>
+
+            <!-- TODO: Add more input sources-->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@android:color/transparent" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:id="@+id/oscStreamersDropdownLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/oscStreamersDropdownIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/arrow_down_float"
+                ap:tint="@color/aperture_term_main_st"
+                android:contentDescription="Dropdown Icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OSC Streamers"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/oscStreamersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:padding="0dp"
+            android:visibility="gone">
+
+            <!-- OSC Stream 1 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stream 1"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+
+            <Spinner
+                android:id="@+id/oscStreamDropdownSpinner1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                style="@style/CustomSpinnerStyle"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/oscStreamAddressEditText1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Enter address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:inputType="text"/>
+
+                <ImageButton
+                    android:id="@+id/oscStreamListenAddressButton1"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_receiver_orange"
+                    android:contentDescription="OSC Listen Address" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@android:color/transparent" />
+
+            <!-- OSC Stream 2 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stream 2"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+
+            <Spinner
+                android:id="@+id/oscStreamDropdownSpinner2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                style="@style/CustomSpinnerStyle"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/oscStreamAddressEditText2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Enter address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:inputType="text"/>
+
+                <ImageButton
+                    android:id="@+id/oscStreamListenAddressButton2"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_receiver_orange"
+                    android:contentDescription="OSC Listen Address" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@android:color/transparent" />
+
+            <!-- OSC Stream 3 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stream 3"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+
+            <Spinner
+                android:id="@+id/oscStreamDropdownSpinner3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                style="@style/CustomSpinnerStyle"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/oscStreamAddressEditText3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Enter address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:inputType="text"/>
+
+                <ImageButton
+                    android:id="@+id/oscStreamListenAddressButton3"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_receiver_orange"
+                    android:contentDescription="OSC Listen Address" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@android:color/transparent" />
+
+            <!-- OSC Stream 4 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stream 4"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+
+            <Spinner
+                android:id="@+id/oscStreamDropdownSpinner4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingStart="8dp"
+                style="@style/CustomSpinnerStyle"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/oscStreamAddressEditText4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Enter address"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:inputType="text"/>
+
+                <ImageButton
+                    android:id="@+id/oscStreamListenAddressButton4"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_receiver_orange"
+                    android:contentDescription="OSC Listen Address" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@android:color/transparent" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</ScrollView>

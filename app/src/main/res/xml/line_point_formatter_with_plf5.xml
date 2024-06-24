@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xy:LineAndPointFormatter xmlns:xy="http://schemas.android.com/apk/res-auto">
+    <xy:linePaint color="#FFAA00" strokeWidth="2dp"/>
+    <xy:vertexPaint color="#FFAA00" strokeWidth="4dp"/>
+</xy:LineAndPointFormatter>

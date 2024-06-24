@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Other styles... -->
+
+    <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:background">@drawable/spinner_background</item>
+        <item name="android:popupBackground">@drawable/spinner_dropdown_selector</item>
+        <item name="android:drawableEnd">@android:drawable/arrow_down_float</item>
+        <item name="android:textColor">@color/aperture_term_main</item>
+    </style>
+
+</resources>
