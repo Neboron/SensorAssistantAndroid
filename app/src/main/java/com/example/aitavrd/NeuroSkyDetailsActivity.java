@@ -1,14 +1,18 @@
 package com.example.aitavrd;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -27,6 +31,10 @@ import com.github.mikephil.charting.data.RadarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.pwittchen.neurosky.library.message.enums.BrainWave;
+import com.mohammedalaa.seekbar.DoubleValueSeekBarView;
+import com.mohammedalaa.seekbar.OnDoubleValueSeekBarChangeListener;
+import com.mohammedalaa.seekbar.OnRangeSeekBarChangeListener;
+import com.mohammedalaa.seekbar.RangeSeekBarView;
 
 import java.text.FieldPosition;
 import java.text.Format;
@@ -39,6 +47,12 @@ import java.util.Map;
 public class NeuroSkyDetailsActivity extends AppCompatActivity
         implements BluetoothNeuroSky.RawDataListener, BluetoothNeuroSky.BrainWavesDataListener,
         BluetoothNeuroSky.EyeBlinkDataListener, BluetoothNeuroSky.AttentionDataListener, BluetoothNeuroSky.MeditationDataListener {
+
+
+    public static final String PREFS_NAME = "aitaPrefsDroid";
+    public static final String BLINK_TRIGGER_INTENSITY_MIN_KEY = "blinkTriggerIntensityMin";
+    public static final String BLINK_TRIGGER_INTENSITY_MAX_KEY = "blinkTriggerIntensityMax";
+    public static final String BLINK_RELEASE_TIME_KEY = "blinkReleaseTime";
 
     private ImageButton returnButton;
     private ImageView connectionStatusIcon;
@@ -59,6 +73,10 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
     private TextView blinkCountVariable, blinkIntensityVariable;
 
 
+    private DoubleValueSeekBarView blinkRangeSeekBar;
+    private RangeSeekBarView blinkReleaseTimeSeekBar;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,30 +87,42 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         String deviceAddress = getIntent().getStringExtra("DEVICE_ADDRESS");
 
         // Set the device name and address to the TextViews
-        TextView deviceNameTextView = findViewById(R.id.deviceName);
-        TextView deviceAddressTextView = findViewById(R.id.deviceAddress);
-        connectionStatusIcon = findViewById(R.id.connectionStatusIcon);
+        TextView deviceNameTextView      = findViewById(R.id.deviceName);
+        TextView deviceAddressTextView   = findViewById(R.id.deviceAddress);
+        connectionStatusIcon             = findViewById(R.id.connectionStatusIcon);
+        rawPlot                          = findViewById(R.id.rawPlot);
+        lowAlphaVariable                 = findViewById(R.id.lowAlphaVariable);
+        highAlphaVariable                = findViewById(R.id.highAlphaVariable);
+        lowBetaVariable                  = findViewById(R.id.lowBetaVariable);
+        highBetaVariable                 = findViewById(R.id.highBetaVariable);
+        lowGamaVariable                  = findViewById(R.id.lowGamaVariable);
+        midGamaVariable                  = findViewById(R.id.midGamaVariable);
+        deltaVariable                    = findViewById(R.id.deltaVariable);
+        thetaVariable                    = findViewById(R.id.thetaVariable);
+        blinkCountVariable               = findViewById(R.id.blinkCountVariable);
+        blinkIntensityVariable           = findViewById(R.id.blinkIntensityVariable);
+        recognitionPlot                  = findViewById(R.id.recognitionPlot);
+        brainWavesRadarChart             = findViewById(R.id.brainWavesRadarChart);
+        blinkRangeSeekBar                = findViewById(R.id.blinkRangeSeekBar);
+        blinkReleaseTimeSeekBar          = findViewById(R.id.blinkReleaseTimeSeekBar);
 
-        // Initialize TextView elements
-        lowAlphaVariable = findViewById(R.id.lowAlphaVariable);
-        highAlphaVariable = findViewById(R.id.highAlphaVariable);
-        lowBetaVariable = findViewById(R.id.lowBetaVariable);
-        highBetaVariable = findViewById(R.id.highBetaVariable);
-        lowGamaVariable = findViewById(R.id.lowGamaVariable);
-        midGamaVariable = findViewById(R.id.midGamaVariable);
-        deltaVariable = findViewById(R.id.deltaVariable);
-        thetaVariable = findViewById(R.id.thetaVariable);
 
-        blinkCountVariable = findViewById(R.id.blinkCountVariable);
-        blinkIntensityVariable = findViewById(R.id.blinkIntensityVariable);
+
+        // Load saved state
+        SharedPreferences preferences        = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int savedBlinkTriggerIntensityMin    = preferences.getInt(BLINK_TRIGGER_INTENSITY_MIN_KEY, 40);
+        int savedBlinkTriggerIntensityMax    = preferences.getInt(BLINK_TRIGGER_INTENSITY_MAX_KEY, 80);
+        int savedBlinkReleaseTime            = preferences.getInt(BLINK_RELEASE_TIME_KEY, 10);
+
+
+        blinkRangeSeekBar.setCurrentMinValue(savedBlinkTriggerIntensityMin);
+        blinkRangeSeekBar.setCurrentMaxValue(savedBlinkTriggerIntensityMax);
+        blinkReleaseTimeSeekBar.setCurrentValue(Math.round(savedBlinkReleaseTime/10));
+
 
         deviceNameTextView.setText(deviceName);
         deviceAddressTextView.setText(deviceAddress);
 
-        // Initialize our XYPlot references
-        rawPlot = findViewById(R.id.rawPlot);
-        recognitionPlot = findViewById(R.id.recognitionPlot);
-        brainWavesRadarChart = findViewById(R.id.brainWavesRadarChart);
 
         // Set up the plots
         configureRawPlot(rawPlot, "Raw Data");
@@ -166,6 +196,53 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
                 checkConnectionHandler.postDelayed(this, 1000);
             }
         };
+
+
+        blinkRangeSeekBar.setOnRangeSeekBarViewChangeListener(new OnDoubleValueSeekBarChangeListener() {
+            @Override
+            public void onValueChanged(@Nullable DoubleValueSeekBarView seekBar, int min, int max, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(@Nullable DoubleValueSeekBarView seekBar, int min, int max) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(@Nullable DoubleValueSeekBarView seekBar, int min, int max) {
+                SharedPreferences.Editor editor = preferences.edit();
+                SharedPreferences preferences   = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                editor.putInt(BLINK_TRIGGER_INTENSITY_MIN_KEY, min);
+                editor.putInt(BLINK_TRIGGER_INTENSITY_MAX_KEY, max);
+                editor.apply();
+                bluetoothNeuroSky.setEyeBlinkFilterParams(min, max, preferences.getInt(BLINK_RELEASE_TIME_KEY, 100)+20);
+            }
+        });
+
+        blinkReleaseTimeSeekBar.setOnRangeSeekBarViewChangeListener(new OnRangeSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(@Nullable RangeSeekBarView seekBar, int time, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(@Nullable RangeSeekBarView seekBar, int time) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(@Nullable RangeSeekBarView seekBar, int time) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putInt(BLINK_RELEASE_TIME_KEY, (time*10));
+                editor.apply();
+                bluetoothNeuroSky.setEyeBlinkFilterParams(preferences.getInt(BLINK_TRIGGER_INTENSITY_MIN_KEY, 0),
+                                                          preferences.getInt(BLINK_TRIGGER_INTENSITY_MAX_KEY, 100), (time*10)+20);
+            }
+        });
+
+
+
         checkConnectionHandler.postDelayed(checkConnectionRunnable, 1000);
 
     }

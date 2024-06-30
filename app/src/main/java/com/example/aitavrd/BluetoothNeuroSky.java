@@ -20,7 +20,9 @@ import com.github.pwittchen.neurosky.library.message.enums.State;
 import com.github.pwittchen.neurosky.library.NeuroSky;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -35,9 +37,10 @@ public class BluetoothNeuroSky {
     private Context context;
     private RawDataListener rawDataListener;
     private BrainWavesDataListener brainWavesDataListener;
-    private EyeBlinkDataListener eyeBlinkDataListener;
+    private List<EyeBlinkDataListener> eyeBlinkDataListeners = new ArrayList<>();
     private AttentionDataListener attentionDataListener;
     private MeditationDataListener meditationDataListener;
+    private OSC oscClient;
 
     private int eyeBlinkCount = 0;
 
@@ -84,6 +87,7 @@ public class BluetoothNeuroSky {
             }
         };
         watchdogHandlerRawData.postDelayed(watchdogRunnableRawData, 4000);
+
     }
 
     public static synchronized BluetoothNeuroSky getInstance(Context context) {
@@ -193,9 +197,9 @@ public class BluetoothNeuroSky {
     }
 
     private void handleBlinkChange(int intensity) {
-        eyeBlinkCount++;
-        if (eyeBlinkDataListener != null) {
-            eyeBlinkDataListener.onEyeBlinkDataReceived(eyeBlinkCount, intensity);
+        if (filterEyeBlink(intensity)) {
+            eyeBlinkCount++;
+            notifyEyeBlinkDataListeners(eyeBlinkCount, intensity);
         }
     }
 
@@ -227,13 +231,33 @@ public class BluetoothNeuroSky {
         void onBrainWavesDataReceived(Map<BrainWave, Integer> brainWavesData);
     }
 
+
+    // Eye blink
     public void setEyeBlinkDataListener(EyeBlinkDataListener listener) {
-        this.eyeBlinkDataListener = listener;
+        addEyeBlinkDataListener(listener);
     }
 
     public interface EyeBlinkDataListener {
         void onEyeBlinkDataReceived(int blinkCount, int blinkIntensity);
     }
+
+    public void addEyeBlinkDataListener(EyeBlinkDataListener listener) {
+        if (!eyeBlinkDataListeners.contains(listener)) {
+            eyeBlinkDataListeners.add(listener);
+        }
+    }
+
+    public void removeEyeBlinkDataListener(EyeBlinkDataListener listener) {
+        eyeBlinkDataListeners.remove(listener);
+    }
+
+    private void notifyEyeBlinkDataListeners(int blinkCount, int blinkIntensity) {
+        for (EyeBlinkDataListener listener : eyeBlinkDataListeners) {
+            listener.onEyeBlinkDataReceived(blinkCount, blinkIntensity);
+        }
+    }
+
+
 
     public void setAttentionDataListener(AttentionDataListener listener) {
         this.attentionDataListener = listener;
@@ -298,5 +322,44 @@ public class BluetoothNeuroSky {
 
     public void stopMonitoring() {
         neuroSky.stop();
+    }
+
+
+
+    /*====================================*/
+    /*==== FILTERS AND POSTPROCESSING ====*/
+    /*====================================*/
+
+    private long lastBlinkTimestamp = 0;
+    private int blinkIntensityMin = 0;
+    private int blinkIntensityMax = 100;
+    private int blinkPeriod = 100;
+
+    /**
+     * Set eye blink filter parameters.
+     * @param intensityMin Minimum trigger intensity (0 to 100).
+     * @param intensityMax Maximum trigger intensity (0 to 100).
+     * @param period Minimum time between blinks (ms), if period is small, blink will be ignored.
+     * @return true if pass filter.
+     */
+    public void setEyeBlinkFilterParams(int intensityMin, int intensityMax, int period) {
+        blinkIntensityMin = intensityMin;
+        blinkIntensityMax = intensityMax;
+        blinkPeriod       = period;
+    }
+
+    /**
+     * Eye blink filter.
+     * @param intensity Blink intensity from NeuroSky Algo.
+     * @return true if pass filter.
+     */
+    public Boolean filterEyeBlink(int intensity) {
+        long currentTime = System.currentTimeMillis();
+        if (intensity >= blinkIntensityMin && intensity <= blinkIntensityMax &&
+                (currentTime - lastBlinkTimestamp) >= blinkPeriod) {
+            lastBlinkTimestamp = currentTime;
+            return true;
+        }
+        return false;
     }
 }

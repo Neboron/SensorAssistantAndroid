@@ -24,6 +24,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -249,8 +250,11 @@ public class SettingsActivity extends AppCompatActivity {
                 int rxPort = Integer.parseInt(oscRxPortEditText.getText().toString());
                 int txPort = Integer.parseInt(oscTxPortEditText.getText().toString());
 
+                //oscClient.initialize(ipAddress, rxPort, txPort);
+
                 try {
-                    List<Object> args = Arrays.asList(0.01f);  // Ensure the float is correctly typed
+                    oscClient.initialize(ipAddress, rxPort, txPort);
+                    List<Object> args = Arrays.asList(0.01f);
                     oscClient.sendMessage("/avatar/parameters/RibbonPoseY", args);
 
                     // Update message count display

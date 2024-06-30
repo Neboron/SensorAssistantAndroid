@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.Map;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ScrollView;
 
@@ -45,7 +48,7 @@ import android.widget.ScrollView;
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky.EyeBlinkDataListener {
 
     private BLEMultiLink.BluetoothLeService bluetoothService;
     private Logger logger;
@@ -59,10 +62,17 @@ public class MainActivity extends AppCompatActivity {
     private ImageView arrowIcon;
     private String deviceAddress;
     private OSC oscClient;
+    private SettingsActivity settingsActivity;
+    private NeuroSkyDetailsActivity neuroSkyDetailsActivity;
 
 
     private final Handler updateDeviceInfoHandler = new Handler();
     private final long UPDATE_DEVICE_INFO_INTERVAL = 10000; // 10 seconds
+
+
+    private boolean eyeBlinkOscEnable = false;
+    private List<String> eyeBlinkOscAddressList;
+    private int eyeBlinkReleaseTime = 100;
 
 
     @Override
@@ -83,8 +93,13 @@ public class MainActivity extends AppCompatActivity {
         logger.log("Application started.");
 
         bleMultiLink = new BLEMultiLink(this);
+
         // Initialize and connect BluetoothNeuroSky
         bluetoothNeuroSky = BluetoothNeuroSky.getInstance(this);
+        bluetoothNeuroSky.addEyeBlinkDataListener(this);
+
+        settingsActivity = new SettingsActivity();
+        neuroSkyDetailsActivity = new NeuroSkyDetailsActivity();
 
         // Initialize OSC and connect to user PC
         oscClient = OSC.getInstance(this);
@@ -551,6 +566,77 @@ public class MainActivity extends AppCompatActivity {
         return intentFilter;
     }
 
+
+
+    /*====================================*/
+    /*========= SETTINGS READER ==========*/
+    /*====================================*/
+
+    private void updateMainSettings() {
+        SharedPreferences preferences = getSharedPreferences(settingsActivity.PREFS_NAME, MODE_PRIVATE);
+
+        eyeBlinkOscAddressList = getMatchingStreamAddresses("EYE BLINK");
+        if (!eyeBlinkOscAddressList.isEmpty()) {
+            eyeBlinkOscEnable = true;
+        } else {
+            eyeBlinkOscEnable = false;
+        }
+        eyeBlinkReleaseTime = preferences.getInt(neuroSkyDetailsActivity.BLINK_RELEASE_TIME_KEY, 100);
+
+    }
+
+    public List<String> getMatchingStreamAddresses(String targetValue) {
+        List<String> matchingAddresses = new ArrayList<>();
+
+        SharedPreferences preferences = getSharedPreferences(settingsActivity.PREFS_NAME, MODE_PRIVATE);
+
+        checkPreferenceForMatch(preferences, settingsActivity.OSC_STREAM1_INPUT_KEY, settingsActivity.OSC_STREAM1_ADDRESS_KEY, targetValue, matchingAddresses);
+        checkPreferenceForMatch(preferences, settingsActivity.OSC_STREAM2_INPUT_KEY, settingsActivity.OSC_STREAM2_ADDRESS_KEY, targetValue, matchingAddresses);
+        checkPreferenceForMatch(preferences, settingsActivity.OSC_STREAM3_INPUT_KEY, settingsActivity.OSC_STREAM3_ADDRESS_KEY, targetValue, matchingAddresses);
+        checkPreferenceForMatch(preferences, settingsActivity.OSC_STREAM4_INPUT_KEY, settingsActivity.OSC_STREAM4_ADDRESS_KEY, targetValue, matchingAddresses);
+
+        return matchingAddresses;
+    }
+
+    private void checkPreferenceForMatch(SharedPreferences preferences, String inputKey, String addressKey, String targetValue, List<String> matchingAddresses) {
+        String inputValue = preferences.getString(inputKey, "");
+        String address = preferences.getString(addressKey, "");
+
+        if (inputValue.contains(targetValue)) {
+            matchingAddresses.add(address);
+        }
+    }
+
+
+    /*====================================*/
+    /*======= NEUROSKY ACTIVITIES ========*/
+    /*====================================*/
+
+    @Override
+    public void onEyeBlinkDataReceived(int blinkCount, int blinkIntensity) {
+        if(eyeBlinkOscEnable) {
+            for (String address : eyeBlinkOscAddressList) {
+                List<Object> args = Arrays.asList(true);
+                oscClient.sendMessage(address, args);
+            }
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Send "false" message after the release time
+                    for (String address : eyeBlinkOscAddressList) {
+                        List<Object> args = Arrays.asList(false);
+                        oscClient.sendMessage(address, args);
+                    }
+                }
+            }, eyeBlinkReleaseTime);
+        }
+
+
+        Log.d("MainActivity", "Blink Count: " + blinkCount + " Blink Intensity: " + blinkIntensity + " eyeBlinkReleaseTime: " + eyeBlinkReleaseTime);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -558,10 +644,13 @@ public class MainActivity extends AppCompatActivity {
         bleMultiLink.destroy();
         oscClient.close();
         bluetoothNeuroSky.disconnect();
+        bluetoothNeuroSky.removeEyeBlinkDataListener(this);
     }
 
     @Override
     protected void onResume() {
+        Log.d("MainActivity", "Resuming");
+        updateMainSettings();
         super.onResume();
         registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter());
     }

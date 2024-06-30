@@ -440,7 +440,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Attention"
-                        android:textColor="@color/aperture_term_main"
+                        android:textColor="@color/white"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -460,12 +460,85 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Meditation"
-                        android:textColor="@color/aperture_term_main"
+                        android:textColor="@color/white"
                         android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
 
         </FrameLayout>
+
+
+        <!-- Blink Trigger Settings -->
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@android:color/transparent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blink Trigger Range (Intensity):"
+            android:textColor="@color/aperture_term_main"
+            android:textSize="16sp" />
+
+        <com.mohammedalaa.seekbar.DoubleValueSeekBarView
+            android:id="@+id/blinkRangeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ap:layout_constraintEnd_toEndOf="parent"
+            ap:layout_constraintStart_toStartOf="parent"
+            ap:r2CurrentMaxValue="80"
+            ap:r2CurrentMinValue="40"
+            ap:r2barHeight="8dp"
+            ap:r2baseColor="@color/aperture_term_main_dark"
+            ap:r2circleFillColor="@color/aperture_term_main"
+            ap:r2circleRadius="14dp"
+            ap:r2circleTextColor="@color/black"
+            ap:r2circleTextSize="@dimen/value_bar_circleTextSize"
+            ap:r2fillColor="@color/aperture_term_main_st"
+            ap:r2maxValue="100"
+            ap:r2maxValueStep="1"
+            ap:r2minValue="0"
+            ap:r2minValueStep="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@android:color/transparent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blink Release Time (seconds x 10^-2):"
+            android:textColor="@color/aperture_term_main"
+            android:textSize="16sp" />
+
+        <com.mohammedalaa.seekbar.RangeSeekBarView
+            android:id="@+id/blinkReleaseTimeSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ap:barHeight="8dp"
+            ap:baseColor="@color/aperture_term_main_dark"
+            ap:circleFillColor="@color/aperture_term_main"
+            ap:circleRadius="14dp"
+            ap:circleTextColor="@color/black"
+            ap:circleTextSize="@dimen/value_bar_circleTextSize"
+            ap:currentValue="10"
+            ap:fillColor="@color/aperture_term_main_st"
+            ap:layout_constraintEnd_toEndOf="parent"
+            ap:layout_constraintStart_toStartOf="parent"
+            ap:layout_constraintTop_toTopOf="parent"
+            ap:maxValue="100"
+            ap:minValue="1"
+            ap:orientation="LEFT_TO_RIGHT"
+            ap:stepValue="1" />
 
 
 

@@ -469,7 +469,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/ic_receiver_orange"
+                    android:src="@drawable/ic_osc_receiver_orange"
                     android:contentDescription="OSC Listen Address" />
             </LinearLayout>
 
@@ -528,7 +528,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/ic_receiver_orange"
+                    android:src="@drawable/ic_osc_receiver_orange"
                     android:contentDescription="OSC Listen Address" />
             </LinearLayout>
 
@@ -587,7 +587,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/ic_receiver_orange"
+                    android:src="@drawable/ic_osc_receiver_orange"
                     android:contentDescription="OSC Listen Address" />
             </LinearLayout>
 
@@ -646,7 +646,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/ic_receiver_orange"
+                    android:src="@drawable/ic_osc_receiver_orange"
                     android:contentDescription="OSC Listen Address" />
             </LinearLayout>
 

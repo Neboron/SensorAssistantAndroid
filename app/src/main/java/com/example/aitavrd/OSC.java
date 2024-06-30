@@ -65,7 +65,6 @@ public class OSC {
     public void sendMessage(String address, List<Object> arguments) {
         Log.d(TAG, "Sending message to address: " + address + " with arguments: " + arguments);
         sendHandler.post(() -> {
-            Log.d(TAG, "Sending message to address 111");
             try {
                 ByteBuffer messageBuffer = ByteBuffer.allocate(1024); // Adjust size as needed
 

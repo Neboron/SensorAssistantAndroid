@@ -47,6 +47,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.androidplot:androidplot-core:1.5.10")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation ("com.github.MohammedAlaaMorsi:RangeSeekBar:1.0.6")
     //implementation("com.illposed.osc:javaosc-core:0.9")
     implementation("com.illposed.osc:javaosc-core:0.9")
     implementation(files("libs/libStreamSDK_v1.2.0.jar"))
