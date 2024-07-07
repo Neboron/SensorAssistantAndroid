@@ -20,9 +20,16 @@ Android application for connecting EEG sensors or Full-body tracking to VRChat.
 1. Application in its early testing phase, it is recommended to download it and try test input sources (in the Settings menu), before assembling devices.
 2. Find or build appropriate hardware if you are planning to use BCI or full-body trackers. Find more information and assembly guides on my hackaday page: NeuroSky EEG for VRChat (Will be added soon), AitaVRT Full-Body Trackers.
 3. Change VRChat launch configs. As we are using Android phone to receive and transmit OSC parameters, it is not longer “_localhost” and VRChat should know the destination IP. This lauch option can be added to in Steam VRChat launch options:
+
+```bash
 --osc=inPort:outIP:outPort
+```
+
 for example:
+```bash
 --osc=9000:9000:192.168.50.3
+```
+
 4. Set the IP address of your PC and “outPort” in the settings menu.
 5. Set the address of the parameter responsible for what you want to control, you can press the listener button while open your in-game avatar menu and select an action in the menu (for example ear position or in menu emotion). You can try to select test input source for OSC stream to check the response. At this stage you should see incrementation of the message count.
 6. Power on the NeuroSky Bluetooth device and pair it with your phone (try standard password: 1234).
