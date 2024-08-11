@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xy:LineAndPointFormatter xmlns:xy="http://schemas.android.com/apk/res-auto">
-    <xy:linePaint color="#FFAA00" strokeWidth="2dp"/>
-    <xy:vertexPaint color="#FFAA00" strokeWidth="4dp"/>
-</xy:LineAndPointFormatter>
+<config
+    linePaint.strokeWidth="2dp"
+    linePaint.color="#1FA600"
+    vertexPaint.strokeWidth="8dp"
+    vertexPaint.color="#FFFFFF"
+    fillPaint.color="#00000000"
+    />

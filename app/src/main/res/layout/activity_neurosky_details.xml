@@ -411,7 +411,7 @@
                 android:id="@+id/recognitionPlot"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                style="@style/MFullScreenGraph.Minimalist.OrangeLabels"
+                style="@style/MFullScreenGraph.Minimalist.Orange"
                 android:background="@color/aperture_term_background" />
 
             <LinearLayout
@@ -484,6 +484,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Eye Blink Settings"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@android:color/transparent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Blink Trigger Range (Intensity):"
             android:textColor="@color/aperture_term_main"
             android:textSize="16sp" />
@@ -498,7 +514,7 @@
             ap:r2CurrentMinValue="40"
             ap:r2barHeight="8dp"
             ap:r2baseColor="@color/aperture_term_main_dark"
-            ap:r2circleFillColor="@color/aperture_term_main"
+            ap:r2circleFillColor="@color/white"
             ap:r2circleRadius="14dp"
             ap:r2circleTextColor="@color/black"
             ap:r2circleTextSize="@dimen/value_bar_circleTextSize"
@@ -526,7 +542,7 @@
             android:layout_height="wrap_content"
             ap:barHeight="8dp"
             ap:baseColor="@color/aperture_term_main_dark"
-            ap:circleFillColor="@color/aperture_term_main"
+            ap:circleFillColor="@color/white"
             ap:circleRadius="14dp"
             ap:circleTextColor="@color/black"
             ap:circleTextSize="@dimen/value_bar_circleTextSize"
@@ -540,10 +556,200 @@
             ap:orientation="LEFT_TO_RIGHT"
             ap:stepValue="1" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Replace Boolean By Integers"
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/blinkUseIntegersSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                ap:trackTint="@color/aperture_term_main_dark"
+                ap:thumbTint="@color/white"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:padding="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TRUE = "
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp" />
+
+            <EditText
+                android:id="@+id/blinkUseIntegersTrueEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint=" "
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:inputType="numberDecimal"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FALSE = "
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp" />
+
+            <EditText
+                android:id="@+id/blinkUseIntegersFalseEditText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint=" "
+                android:textColor="@color/aperture_term_main"
+                android:textSize="16sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:inputType="numberDecimal" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
+
+        <!-- Filter and Interpolation Settings -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Filtering And Processing"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@android:color/transparent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attention Filtering"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/aperture_term_main" />
+
+        <Spinner
+            android:id="@+id/attentionFilterDropdownSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingStart="8dp"
+            style="@style/CustomSpinnerStyle"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meditation Filtering"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/aperture_term_main" />
+
+        <Spinner
+            android:id="@+id/meditationFilterDropdownSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingStart="8dp"
+            style="@style/CustomSpinnerStyle"/>
+
+        <LinearLayout
+            android:id="@+id/interpolationPlotDropdownLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/interpolationPlotDropdownIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/arrow_down_float"
+                ap:tint="@color/aperture_term_main_st"
+                android:contentDescription="Dropdown Icon" />
+
+            <TextView
+                android:id="@+id/interpolationPlotDropdownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Data Interpolation Curves"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+        </LinearLayout>
+
+        <com.androidplot.xy.XYPlot
+            android:id="@+id/attentionInterpolationPlot"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            style="@style/MFullScreenGraph.Minimalist.OrangeLabels"
+            android:background="@color/aperture_term_background"
+            android:visibility="gone" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:background="@android:color/transparent" />
+
+        <com.androidplot.xy.XYPlot
+            android:id="@+id/meditationInterpolationPlot"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            style="@style/MFullScreenGraph.Minimalist.OrangeLabels"
+            android:background="@color/aperture_term_background"
+            android:visibility="gone" />
 
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/aperture_term_main_st" />
 
-        <!-- Add more views for telemetry and settings here -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:background="@android:color/transparent" />
+
 
     </LinearLayout>
 

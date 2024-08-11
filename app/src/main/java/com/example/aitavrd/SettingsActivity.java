@@ -30,6 +30,7 @@ import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
     public static final String PREFS_NAME = "aitaPrefsDroid";
+    public static final String SETTINGS_UPDATE_FLAG = "settingsUpdateFlag";
     public static final String NEUROSKY_SWITCH_KEY = "neuroSkySwitch";
     public static final String AITAVRT_SWITCH_KEY = "aitaVrtSwitch";
     public static final String OSC_SWITCH_KEY = "oscSwitch";
@@ -133,7 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
         boolean neuroSkySwitchState    = preferences.getBoolean(NEUROSKY_SWITCH_KEY, true);
         boolean aitaVrtSwitchState     = preferences.getBoolean(AITAVRT_SWITCH_KEY, true);
         boolean oscSwitchState         = preferences.getBoolean(OSC_SWITCH_KEY, true);
-        String  savedOscIpAddress      = preferences.getString(OSC_IP_KEY, "4.8.15.16.23.42"); // Never mind
+        String  savedOscIpAddress      = preferences.getString(OSC_IP_KEY, "192.168.50.3"); // Never mind
         String  savedOscRxPort         = preferences.getString(OSC_RX_PORT_KEY, "9000"); // Default to 9000 (VRChat RX)
         String  savedOscTxPort         = preferences.getString(OSC_TX_PORT_KEY, "9001"); // Default to 9001 (VRChat TX)
         String  savedOscStreamInput1   = preferences.getString(OSC_STREAM1_INPUT_KEY, "DISABLE");

@@ -144,6 +144,7 @@
         <item name="backgroundColor">@color/aperture_term_background</item>
         <item name="gridBackgroundColor">@color/aperture_term_background</item>
         <item name="borderColor">@color/aperture_term_main_st</item>
+        <item name="lineLabels">bottom</item>
         <item name="legendTextColor">@color/aperture_term_main</item>
     </style>
 </resources>
