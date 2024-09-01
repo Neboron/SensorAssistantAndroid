@@ -8,9 +8,6 @@
     <string-array name="osc_stream_input_items">
         <item>DISABLE</item>
         <item>TSB1F</item>
-        <item>TSB2F</item>
-        <item>TS</item>
-        <item>TB</item>
         <item>NEUROSKY EYE BLINK</item>
         <item>NEUROSKY ATTENTION</item>
         <item>NEUROSKY MEDITATION</item>
