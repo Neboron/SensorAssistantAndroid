@@ -1,4 +1,11 @@
+
+
+
 # VRC Tracker Assistant
+<p align="center">
+   <a href="https://www.youtube.com/@norobe"><img alt="Youtube" src="https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white"></a>
+<a href="https://discord.gg/VWFDmSh4"><img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white"></a>
+  
 Android application for connecting EEG sensors or Full-body tracking to VRChat.
 
 ## Features
@@ -43,4 +50,22 @@ You can try to select test input source for OSC stream to check the response. At
 6. Power on the NeuroSky Bluetooth device and pair it with your phone (try standard password: 1234).
 7. Press “Run” button in the application, it should appear in the “Device List”.
 8. Open Device List and tap on appeared NeuroSky BCI. In the device configuration menu you can change filtering settings, triggers, see telemetry data and so on. Try to train your concentration and meditation (I personaly reecomend to use meditation data for avatar ear control.
-9. 
+
+
+## Hardware (NeuroSky EEG)
+Theoretically, you can use any NeuroSky BCI to connect it to the SensorAssistant application. For testing, I am using the [TGAM development kit with a LiPo battery](https://www.aliexpress.com/item/1005003264615528.html?spm=a2g0o.productlist.main.13.279f25h725h7ge&algo_pvid=9fcc7c6a-c934-4aaf-b15e-811fb3fb25e6&algo_exp_id=9fcc7c6a-c934-4aaf-b15e-811fb3fb25e6-6&pdp_npi=4%40dis%21EUR%21149.72%2182.35%21%21%21161.91%2189.05%21%40211b441e17251880075954093e5d8a%2112000024946486676%21sea%21EE%210%21ABX&curPageLogUid=n5pUGUBUVrRN&utparam-url=scene%3Asearch%7Cquery_from%3A).
+
+The case for the module was created for the BoboVR strap, but you can modify the scope to fit other straps. [GRABCAD](https://grabcad.com/library/neurosky-tgam-module-case-for-bobo-vr-strap-1)
+
+### Connect your electrodes to your head
+NeuroSky modules require two dry electrodes: the active electrode (Fp1) and the reference clip (A1). The Fp1 electrode should be positioned on your forehead, approximately one inch above your right eyebrow (from your perspective) and about an inch to the left of your forehead's centerline.
+reference clip connects to your earlobe.
+
+![Brain Sensor Map](https://raw.githubusercontent.com/Neboron/SensorAssistantAndroid/main/demo_media/BrainSensorMap.jpg)
+
+BoboVR S3 mounting arc pad is a good place to put Fp1.
+
+There is a way to save money and assemble it using only the TGAM module and ESP32 in Bluetooth mode, but this setup hasn't been tested yet.
+
+
+
