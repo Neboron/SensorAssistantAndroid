@@ -8,6 +8,7 @@
   
 Android application for connecting EEG sensors or Full-body tracking to VRChat.
 
+NeuroSky Tests Video:
 [![NeuroSky Test](https://img.youtube.com/vi/0L9tE0ZVeks/maxresdefault.jpg)](https://www.youtube.com/watch?v=0L9tE0ZVeks)
 
 ## Features
