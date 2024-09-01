@@ -8,6 +8,8 @@
   
 Android application for connecting EEG sensors or Full-body tracking to VRChat.
 
+[![NeuroSky Test](https://img.youtube.com/vi/0L9tE0ZVeks/maxresdefault.jpg)](https://www.youtube.com/watch?v=0L9tE0ZVeks)
+
 ## Features
 - :brain: Connect the NeuroSky brain-computer interface (BCI) to your VRChat avatar. Utilize your attention and meditation levels, along with advanced filtering and a system of triggers, to perform actions such as ear movements and eye blinking.
 - :gear: Easily locate the necessary parameters and their OSC addresses for debugging and development. This feature facilitates the connection of the BCI to your avatar without needing to use Unity or make any avatar modifications.
