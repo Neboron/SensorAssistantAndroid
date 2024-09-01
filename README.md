@@ -32,11 +32,13 @@ for example:
 ```
 
 4. Set the IP address of your PC and “outPort” in the settings menu.
-5. Set the address of the parameter responsible for what you want to control, you can press the listener button while open your in-game avatar menu and select an action in the menu (for example ear position or in menu emotion). You can try to select test input source for OSC stream to check the response. At this stage you should see incrementation of the message count.
+5. Set the address of the parameter responsible for what you want to control, you can press the listener button while open your in-game avatar menu and select an action in the menu (for example ear position or in menu emotion).
 
-<video width="600" controls>
-  <source src="https://github.com/Neboron/SensorAssistantAndroid/tree/main/demo_media/SettingsDemo_01.mp4" type="video/mp4">
-</video>
+[![Watch the video](https://img.youtube.com/vi/7nr_uq7nKiw/maxresdefault.jpg)](https://www.youtube.com/watch?v=7nr_uq7nKiw)
+
+You can try to select test input source for OSC stream to check the response. At this stage you should see incrementation of the message count.
+
+[![Watch the video](https://img.youtube.com/vi/VXL8nJ8EH90/maxresdefault.jpg)](https://www.youtube.com/watch?v=VXL8nJ8EH90)
 
 6. Power on the NeuroSky Bluetooth device and pair it with your phone (try standard password: 1234).
 7. Press “Run” button in the application, it should appear in the “Device List”.
