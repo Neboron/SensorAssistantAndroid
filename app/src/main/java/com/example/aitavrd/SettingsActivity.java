@@ -251,12 +251,8 @@ public class SettingsActivity extends AppCompatActivity {
                 int rxPort = Integer.parseInt(oscRxPortEditText.getText().toString());
                 int txPort = Integer.parseInt(oscTxPortEditText.getText().toString());
 
-                //oscClient.initialize(ipAddress, rxPort, txPort);
-
                 try {
                     oscClient.initialize(ipAddress, rxPort, txPort);
-                    List<Object> args = Arrays.asList(0.01f);
-                    oscClient.sendMessage("/avatar/parameters/RibbonPoseY", args);
 
                     // Update message count display
                     oscMessagesSentCount.setText(String.valueOf(oscClient.getTransmittedMessageCount()));
@@ -327,6 +323,7 @@ public class SettingsActivity extends AppCompatActivity {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM1_INPUT_KEY, selectedItem);
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
 
@@ -339,6 +336,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (!hasFocus) {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM1_ADDRESS_KEY, oscStreamAddressEditText1.getText().toString());
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
         });
@@ -356,6 +354,8 @@ public class SettingsActivity extends AppCompatActivity {
                     oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                 } else {
                     isListeningForOscMessage = true;
+                    // Stop sending messages to prevent receiving of feedback OSC
+                    oscClient.stopMessageSender();
                     oscStreamAddressEditText1.setText("Listening For OSC Message...");
                     oscClient.receiveSingleMessage(new OSC.OSCMessageListener() {
                         @Override
@@ -364,7 +364,9 @@ public class SettingsActivity extends AppCompatActivity {
                                 oscStreamAddressEditText1.setText(address);
                                 SharedPreferences.Editor editor = preferences.edit();
                                 editor.putString(OSC_STREAM1_ADDRESS_KEY, oscStreamAddressEditText1.getText().toString());
+                                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                                 editor.apply();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                             });
@@ -377,6 +379,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void run() {
                             if (isListeningForOscMessage) {
                                 oscClient.cancelReceiveSingleMessage();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscStreamAddressEditText1.setText("");
                             }
@@ -397,6 +400,7 @@ public class SettingsActivity extends AppCompatActivity {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM2_INPUT_KEY, selectedItem);
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
 
@@ -409,6 +413,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (!hasFocus) {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM2_ADDRESS_KEY, oscStreamAddressEditText2.getText().toString());
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
         });
@@ -426,6 +431,8 @@ public class SettingsActivity extends AppCompatActivity {
                     oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                 } else {
                     isListeningForOscMessage = true;
+                    // Stop sending messages to prevent receiving of feedback OSC
+                    oscClient.stopMessageSender();
                     oscStreamAddressEditText2.setText("Listening For OSC Message...");
                     oscClient.receiveSingleMessage(new OSC.OSCMessageListener() {
                         @Override
@@ -434,7 +441,9 @@ public class SettingsActivity extends AppCompatActivity {
                                 oscStreamAddressEditText2.setText(address);
                                 SharedPreferences.Editor editor = preferences.edit();
                                 editor.putString(OSC_STREAM2_ADDRESS_KEY, oscStreamAddressEditText2.getText().toString());
+                                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                                 editor.apply();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                             });
@@ -447,6 +456,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void run() {
                             if (isListeningForOscMessage) {
                                 oscClient.cancelReceiveSingleMessage();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscStreamAddressEditText2.setText("");
                             }
@@ -466,6 +476,7 @@ public class SettingsActivity extends AppCompatActivity {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM3_INPUT_KEY, selectedItem);
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
 
@@ -478,6 +489,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (!hasFocus) {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM3_ADDRESS_KEY, oscStreamAddressEditText3.getText().toString());
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
         });
@@ -495,6 +507,8 @@ public class SettingsActivity extends AppCompatActivity {
                     oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                 } else {
                     isListeningForOscMessage = true;
+                    // Stop sending messages to prevent receiving of feedback OSC
+                    oscClient.stopMessageSender();
                     oscStreamAddressEditText3.setText("Listening For OSC Message...");
                     oscClient.receiveSingleMessage(new OSC.OSCMessageListener() {
                         @Override
@@ -503,7 +517,9 @@ public class SettingsActivity extends AppCompatActivity {
                                 oscStreamAddressEditText3.setText(address);
                                 SharedPreferences.Editor editor = preferences.edit();
                                 editor.putString(OSC_STREAM3_ADDRESS_KEY, oscStreamAddressEditText3.getText().toString());
+                                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                                 editor.apply();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                             });
@@ -516,6 +532,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void run() {
                             if (isListeningForOscMessage) {
                                 oscClient.cancelReceiveSingleMessage();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscStreamAddressEditText3.setText("");
                             }
@@ -535,6 +552,7 @@ public class SettingsActivity extends AppCompatActivity {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM4_INPUT_KEY, selectedItem);
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
 
@@ -547,6 +565,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (!hasFocus) {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(OSC_STREAM4_ADDRESS_KEY, oscStreamAddressEditText4.getText().toString());
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
             }
         });
@@ -564,6 +583,8 @@ public class SettingsActivity extends AppCompatActivity {
                     oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                 } else {
                     isListeningForOscMessage = true;
+                    // Stop sending messages to prevent receiving of feedback OSC
+                    oscClient.stopMessageSender();
                     oscStreamAddressEditText4.setText("Listening For OSC Message...");
                     oscClient.receiveSingleMessage(new OSC.OSCMessageListener() {
                         @Override
@@ -572,7 +593,9 @@ public class SettingsActivity extends AppCompatActivity {
                                 oscStreamAddressEditText4.setText(address);
                                 SharedPreferences.Editor editor = preferences.edit();
                                 editor.putString(OSC_STREAM4_ADDRESS_KEY, oscStreamAddressEditText4.getText().toString());
+                                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                                 editor.apply();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscTimeoutHandler.removeCallbacks(oscTimeoutRunnable);
                             });
@@ -585,6 +608,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void run() {
                             if (isListeningForOscMessage) {
                                 oscClient.cancelReceiveSingleMessage();
+                                oscClient.resumeMessageSender();
                                 isListeningForOscMessage = false;
                                 oscStreamAddressEditText4.setText("");
                             }

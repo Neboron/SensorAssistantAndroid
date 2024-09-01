@@ -688,6 +688,11 @@
             android:paddingStart="8dp"
             style="@style/CustomSpinnerStyle"/>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:background="@android:color/transparent" />
+
         <LinearLayout
             android:id="@+id/interpolationPlotDropdownLayout"
             android:layout_width="match_parent"
@@ -737,6 +742,308 @@
             style="@style/MFullScreenGraph.Minimalist.OrangeLabels"
             android:background="@color/aperture_term_background"
             android:visibility="gone" />
+
+        <!-- Emotion Triggers -->
+        <LinearLayout
+            android:id="@+id/triggerSettingsDropdownLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/triggerSettingsDropdownIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/arrow_down_float"
+                ap:tint="@color/aperture_term_main_st"
+                android:contentDescription="Dropdown Icon" />
+
+            <TextView
+                android:id="@+id/triggerSettingsDropdownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Emotion Trigger Settings"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/aperture_term_main" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/triggerSettingsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Attention Trigger (set emotion on value)"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/attentionTriggerSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    ap:trackTint="@color/aperture_term_main_dark"
+                    ap:thumbTint="@color/white"
+                    />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:background="@android:color/transparent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="4dp">
+
+                <!-- First Picker with Label -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ATNT ≥"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="16sp"
+                        android:gravity="center" />
+
+                    <NumberPicker
+                        android:id="@+id/attentionTriggerValuePicker"
+                        android:theme="@style/Aperture.NumberPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+
+                <!-- Vertical Divider -->
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/aperture_term_main"
+                    android:layout_marginHorizontal="8dp" />
+
+                <!-- Second Picker with Label -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EMOTION ID"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="16sp"
+                        android:gravity="center" />
+
+                    <NumberPicker
+                        android:id="@+id/attentionTriggerEmotionIdPicker"
+                        android:theme="@style/Aperture.NumberPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+
+                <!-- Vertical Divider -->
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/aperture_term_main"
+                    android:layout_marginHorizontal="8dp" />
+
+                <!-- Third Picker with Label -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STRENGTH"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="16sp"
+                        android:gravity="center" />
+
+                    <NumberPicker
+                        android:id="@+id/attentionTriggerStrengthPicker"
+                        android:theme="@style/Aperture.NumberPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:background="@android:color/transparent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp"
+                android:padding="0dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Meditation Trigger (set emotion on value)"
+                    android:textColor="@color/aperture_term_main"
+                    android:textSize="16sp"
+                    android:paddingStart="8dp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/meditationTriggerSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    ap:trackTint="@color/aperture_term_main_dark"
+                    ap:thumbTint="@color/white"
+                    />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:background="@android:color/transparent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="4dp">
+
+                <!-- First Picker with Label -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MEDI ≥"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="16sp"
+                        android:gravity="center" />
+
+                    <NumberPicker
+                        android:id="@+id/meditationTriggerValuePicker"
+                        android:theme="@style/Aperture.NumberPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+
+                <!-- Vertical Divider -->
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/aperture_term_main"
+                    android:layout_marginHorizontal="8dp" />
+
+                <!-- Second Picker with Label -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EMOTION ID"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="16sp"
+                        android:gravity="center" />
+
+                    <NumberPicker
+                        android:id="@+id/meditationTriggerEmotionIdPicker"
+                        android:theme="@style/Aperture.NumberPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+
+                <!-- Vertical Divider -->
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/aperture_term_main"
+                    android:layout_marginHorizontal="8dp" />
+
+                <!-- Third Picker with Label -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STRENGTH"
+                        android:textColor="@color/aperture_term_main"
+                        android:textSize="16sp"
+                        android:gravity="center" />
+
+                    <NumberPicker
+                        android:id="@+id/meditationTriggerStrengthPicker"
+                        android:theme="@style/Aperture.NumberPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
 
 
         <View

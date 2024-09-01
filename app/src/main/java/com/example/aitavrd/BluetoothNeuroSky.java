@@ -21,6 +21,7 @@ import com.github.pwittchen.neurosky.library.NeuroSky;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -38,8 +39,8 @@ public class BluetoothNeuroSky {
     private RawDataListener rawDataListener;
     private BrainWavesDataListener brainWavesDataListener;
     private List<EyeBlinkDataListener> eyeBlinkDataListeners = new ArrayList<>();
-    private AttentionDataListener attentionDataListener;
-    private MeditationDataListener meditationDataListener;
+    private List<AttentionDataListener> attentionDataListeners = new ArrayList<>();
+    private List<MeditationDataListener> meditationDataListeners = new ArrayList<>();
     private OSC oscClient;
 
     private int eyeBlinkCount = 0;
@@ -88,6 +89,9 @@ public class BluetoothNeuroSky {
         };
         watchdogHandlerRawData.postDelayed(watchdogRunnableRawData, 4000);
 
+        // Initialize the circular buffers with the default size
+        attentionBuffer = new CircularBuffer(attentionBufferSize);
+        meditationBuffer = new CircularBuffer(meditationBufferSize);
     }
 
     public static synchronized BluetoothNeuroSky getInstance(Context context) {
@@ -204,15 +208,11 @@ public class BluetoothNeuroSky {
     }
 
     private void handleAttentionChange(int value) {
-        if (attentionDataListener != null) {
-            attentionDataListener.onAttentionDataReceived(value);
-        }
+        notifyAttentionDataListeners(value);
     }
 
     private void handleMeditationChange(int value) {
-        if (meditationDataListener != null) {
-            meditationDataListener.onMeditationDataReceived(value);
-        }
+        notifyMeditationDataListeners(value);
     }
 
     public void setRawDataListener(RawDataListener listener) {
@@ -258,21 +258,54 @@ public class BluetoothNeuroSky {
     }
 
 
-
+    // Attention
     public void setAttentionDataListener(AttentionDataListener listener) {
-        this.attentionDataListener = listener;
+        addAttentionDataListener(listener);
     }
 
     public interface AttentionDataListener {
         void onAttentionDataReceived(int value);
     }
 
+    public void addAttentionDataListener(AttentionDataListener listener) {
+        if (!attentionDataListeners.contains(listener)) {
+            attentionDataListeners.add(listener);
+        }
+    }
+
+    public void removeAttentionDataListener(AttentionDataListener listener) {
+        attentionDataListeners.remove(listener);
+    }
+
+    private void notifyAttentionDataListeners(int value) {
+        for (AttentionDataListener listener : attentionDataListeners) {
+            listener.onAttentionDataReceived(value);
+        }
+    }
+
+    // Meditation
     public void setMeditationDataListener(MeditationDataListener listener) {
-        this.meditationDataListener = listener;
+        addMeditationDataListener(listener);
     }
 
     public interface MeditationDataListener {
         void onMeditationDataReceived(int value);
+    }
+
+    public void addMeditationDataListener(MeditationDataListener listener) {
+        if (!meditationDataListeners.contains(listener)) {
+            meditationDataListeners.add(listener);
+        }
+    }
+
+    public void removeMeditationDataListener(MeditationDataListener listener) {
+        meditationDataListeners.remove(listener);
+    }
+
+    private void notifyMeditationDataListeners(int value) {
+        for (MeditationDataListener listener : meditationDataListeners) {
+            listener.onMeditationDataReceived(value);
+        }
     }
 
 
@@ -307,8 +340,14 @@ public class BluetoothNeuroSky {
         return connectedDeviceAddress;
     }
 
+    private Boolean lastConnectionStatus = false;
     public Boolean getConnectionStatus() {
-        return isConnected;
+        if (lastConnectionStatus && isConnected) { // TODO: Find better way to read connection status.
+            return true;
+        } else {
+            lastConnectionStatus = isConnected;
+            return false;
+        }
     }
 
     public void disconnect() {
@@ -334,6 +373,26 @@ public class BluetoothNeuroSky {
     private int blinkIntensityMin = 0;
     private int blinkIntensityMax = 100;
     private int blinkPeriod = 100;
+
+    // Circular buffers for smoothing
+    private int attentionBufferSize = 4; // Default size
+    private int meditationBufferSize = 4; // Default size
+    private CircularBuffer attentionBuffer;
+    private CircularBuffer meditationBuffer;
+
+    // Control points for Attention and Meditation interpolation
+    private float[] attentionControlValuesX = new float[5];
+    private float[] attentionControlValuesY = new float[5];
+    private float[] meditationControlValuesX = new float[5];
+    private float[] meditationControlValuesY = new float[5];
+
+    // State variables for Attention trigger
+    private int attentionTriggerCounter = 0;
+    private int attentionTriggerDecrementCounter = 0;
+
+    // State variables for Meditation trigger
+    private int meditationTriggerCounter = 0;
+    private int meditationTriggerDecrementCounter = 0;
 
     /**
      * Set eye blink filter parameters.
@@ -361,5 +420,221 @@ public class BluetoothNeuroSky {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Sets the buffer size for smoothing Attention values.
+     * @param size The buffer size (must be between 2 and 32).
+     */
+    public void setAttentionBufferSize(int size) {
+        if (size < 2 || size > 32) {
+            throw new IllegalArgumentException("Buffer size must be between 2 and 32.");
+        }
+        attentionBufferSize = size;
+        attentionBuffer = new CircularBuffer(attentionBufferSize); // Reinitialize with the new size
+    }
+
+    /**
+     * Sets the buffer size for smoothing Meditation values.
+     * @param size The buffer size (must be between 2 and 32).
+     */
+    public void setMeditationBufferSize(int size) {
+        if (size < 2 || size > 32) {
+            throw new IllegalArgumentException("Buffer size must be between 2 and 32.");
+        }
+        meditationBufferSize = size;
+        meditationBuffer = new CircularBuffer(meditationBufferSize); // Reinitialize with the new size
+    }
+
+    /**
+     * Smoothes the given Attention value using the circular buffer.
+     * @param newValue The new Attention value to add to the buffer.
+     * @return The smoothed Attention value.
+     */
+    public float smoothAttentionValue(float newValue) {
+        attentionBuffer.add(newValue);
+        float smoothed = attentionBuffer.getAverage();
+        return smoothed;
+    }
+
+    /**
+     * Smoothes the given Meditation value using the circular buffer.
+     * @param newValue The new Meditation value to add to the buffer.
+     * @return The smoothed Meditation value.
+     */
+    public float smoothMeditationValue(float newValue) {
+        meditationBuffer.add(newValue);
+        return meditationBuffer.getAverage();
+    }
+
+    // Circular buffer class
+    private static class CircularBuffer {
+        private float[] buffer;
+        private int index;
+        private int size;
+        private int count;
+
+        public CircularBuffer(int size) {
+            this.size = size;
+            this.buffer = new float[size];
+            this.index = 0;
+            this.count = 0;
+        }
+
+        public void add(float value) {
+            buffer[index] = value;
+            index = (index + 1) % size;
+            if (count < size) {
+                count++;
+            }
+        }
+
+        public float getAverage() {
+            float sum = 0;
+            for (int i = 0; i < count; i++) {
+                sum += buffer[i];
+            }
+            return sum / count;
+        }
+    }
+
+
+
+    /* For more information about Interpolation check this article:
+       https://medium.com/yellowme/custom-ease-interpolator-for-meaningful-motion-in-android-4f6503398b89
+     */
+
+    /**
+     * Set the control points for Attention interpolation.
+     * @param xValues The x-values for the control points (length must be 5).
+     * @param yValues The y-values for the control points (length must be 5).
+     */
+    public void setAttentionControlPoints(float[] xValues, float[] yValues) {
+        if (xValues.length != 5 || yValues.length != 5) {
+            throw new IllegalArgumentException("The length of xValues and yValues must be 5.");
+        }
+        System.arraycopy(xValues, 0, attentionControlValuesX, 0, 5);
+        System.arraycopy(yValues, 0, attentionControlValuesY, 0, 5);
+    }
+
+    /**
+     * Set the control points for Meditation interpolation.
+     * @param xValues The x-values for the control points (length must be 5).
+     * @param yValues The y-values for the control points (length must be 5).
+     */
+    public void setMeditationControlPoints(float[] xValues, float[] yValues) {
+        if (xValues.length != 5 || yValues.length != 5) {
+            throw new IllegalArgumentException("The length of xValues and yValues must be 5.");
+        }
+        System.arraycopy(xValues, 0, meditationControlValuesX, 0, 5);
+        System.arraycopy(yValues, 0, meditationControlValuesY, 0, 5);
+    }
+
+    /**
+     * Interpolates a value for Attention using Cubic Bezier interpolation and five control points.
+     * @param x The x-value for which to interpolate.
+     * @return The interpolated y-value for Attention.
+     */
+    public float interpolateAttention(float x) {
+        return interpolate(x, attentionControlValuesX, attentionControlValuesY);
+    }
+
+    /**
+     * Interpolates a value for Meditation using Cubic Bezier interpolation and five control points.
+     * @param x The x-value for which to interpolate.
+     * @return The interpolated y-value for Meditation.
+     */
+    public float interpolateMeditation(float x) {
+        return interpolate(x, meditationControlValuesX, meditationControlValuesY);
+    }
+
+    /**
+     * Cubic Bezier interpolation using five control points.
+     * @param t The interpolation factor (0 to 1).
+     * @param p0 The first control point.
+     * @param p1 The second control point.
+     * @param p2 The third control point.
+     * @param p3 The fourth control point.
+     * @param p4 The fifth control point.
+     * @return The interpolated value.
+     */
+    private float cubicBezierInterpolation(float t, float p0, float p1, float p2, float p3, float p4) {
+        float u = 1 - t;
+        return u * u * u * u * p0 +
+                4 * u * u * u * t * p1 +
+                6 * u * u * t * t * p2 +
+                4 * u * t * t * t * p3 +
+                t * t * t * t * p4;
+    }
+
+    /**
+     * Interpolates between five y-values given an x-value.
+     * @param x The x-value for which to interpolate (should be between the first and last x-values).
+     * @param xValues The array of x-values (control points).
+     * @param yValues The array of y-values (control points).
+     * @return The interpolated y-value.
+     */
+    public float interpolate(float x, float[] xValues, float[] yValues) {
+        if (xValues.length != 5 || yValues.length != 5) {
+            throw new IllegalArgumentException("The length of xValues and yValues must be 5.");
+        }
+
+        // Normalize x between 0 and 1
+        float t = (x - xValues[0]) / (xValues[4] - xValues[0]);
+
+        // Perform cubic Bezier interpolation
+        return cubicBezierInterpolation(t, yValues[0], yValues[1], yValues[2], yValues[3], yValues[4]);
+    }
+
+
+    /**
+     * Check if the attention trigger condition is met.
+     * @param currentAttention The current attention value.
+     * @param triggerValue The attention value that must be reached or exceeded.
+     * @param strength The number of consecutive calls required to trigger.
+     * @return true if the attention trigger condition is met, false otherwise.
+     */
+    public boolean checkAttentionTrigger(int currentAttention, int triggerValue, int strength) {
+        if (currentAttention >= triggerValue) {
+            if (attentionTriggerCounter < strength) {
+                attentionTriggerCounter++;
+            }
+            attentionTriggerDecrementCounter = strength; // Reset decrement counter
+        } else {
+            if (attentionTriggerDecrementCounter > 0) {
+                attentionTriggerDecrementCounter--;
+            } else if (attentionTriggerCounter > 0) {
+                attentionTriggerCounter--; // Decrease the counter when value drops below trigger
+            }
+        }
+
+        // Trigger achieved if the counter is equal or greater than strength
+        return attentionTriggerCounter >= strength;
+    }
+
+    /**
+     * Check if the meditation trigger condition is met.
+     * @param currentMeditation The current meditation value.
+     * @param triggerValue The meditation value that must be reached or exceeded.
+     * @param strength The number of consecutive calls required to trigger.
+     * @return true if the meditation trigger condition is met, false otherwise.
+     */
+    public boolean checkMeditationTrigger(int currentMeditation, int triggerValue, int strength) {
+        if (currentMeditation >= triggerValue) {
+            if (meditationTriggerCounter < strength) {
+                meditationTriggerCounter++;
+            }
+            meditationTriggerDecrementCounter = strength; // Reset decrement counter
+        } else {
+            if (meditationTriggerDecrementCounter > 0) {
+                meditationTriggerDecrementCounter--;
+            } else if (meditationTriggerCounter > 0) {
+                meditationTriggerCounter--; // Decrease the counter when value drops below trigger
+            }
+        }
+
+        // Trigger achieved if the counter is equal or greater than strength
+        return meditationTriggerCounter >= strength;
     }
 }

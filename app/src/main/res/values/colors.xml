@@ -4,6 +4,7 @@
     <color name="aperture_term_main">#F5B617</color>
     <color name="aperture_term_main_st">#B2F5B617</color>
     <color name="aperture_term_main_dark">#B2976F0D</color>
+    <color name="aperture_term_error">#FF3F3F</color>
     <color name="green_term_main_st">#991EC800</color>
     <color name="orange_900">#F57F17</color>
     <color name="purple_200">#FFBB86FC</color>

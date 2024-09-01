@@ -30,6 +30,7 @@ import java.util.Map;
 
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,7 +51,8 @@ import android.widget.ScrollView;
 
 
 
-public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky.EyeBlinkDataListener {
+public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky.EyeBlinkDataListener,
+        BluetoothNeuroSky.AttentionDataListener, BluetoothNeuroSky.MeditationDataListener {
 
     private BLEMultiLink.BluetoothLeService bluetoothService;
     private Logger logger;
@@ -76,9 +78,47 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
     private boolean eyeBlinkOscEnable = false;
     private boolean eyeBlinkUseIntegers = false;
     private List<String> eyeBlinkOscAddressList;
+    private int eyeBlinkTriggerIntensityMin = 0;
+    private int eyeBlinkTriggerIntensityMax = 100;
     private int eyeBlinkReleaseTime = 100;
     private int eyeBlinkUseIntegersTrue = 1;
     private int eyeBlinkUseIntegersFalse = 0;
+    private boolean attentionOscEnable = false;
+    private boolean meditationOscEnable = false;
+    private List<String> attentionOscAddressList;
+    private List<String> meditationOscAddressList;
+    private String attentionFilterName;
+    private String meditationFilterName;
+    private int attentionSmoothingValue;
+    private int meditationSmoothingValue;
+    private Number[]  attentionInterpolationPointValues = {0, 25, 50, 75, 100};
+    private Number[]  meditationInterpolationPointValues = {0, 25, 50, 75, 100};
+    private List<String> emotionTriggerOscAddressList;
+    private boolean emotionTriggerOscEnable = false;
+    private boolean attentionTriggerEnable;
+    private boolean attentionTriggered;
+    private int attentionTriggerValue;
+    private int attentionTriggerEmotionId;
+    private int attentionTriggerStrength;
+    private boolean meditationTriggerEnable;
+    private boolean meditationTriggered;
+    private int meditationTriggerValue;
+    private int meditationTriggerEmotionId;
+    private int meditationTriggerStrength;
+    private boolean emotionSet;
+
+    // Variables to hold the previous values for attention and meditation
+    private float previousAttentionValue = 0f;
+    private float previousMeditationValue = 0f;
+
+    // Handler and Runnables for the interpolation steps
+    private final Handler attentionHandler = new Handler();
+    private final Handler meditationHandler = new Handler();
+
+    // Constants for smoothing
+    private final int smoothingSteps = 5; // Number of steps for smoothing
+    private final int smoothingInterval = 200; // Interval between steps in milliseconds (5Hz)
+
 
 
     @Override
@@ -97,12 +137,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
 
         logger = new Logger(logTextView, scrollViewLog);
         logger.log("Application started.");
+        logger.showLogo();
+
 
         bleMultiLink = new BLEMultiLink(this);
 
         // Initialize and connect BluetoothNeuroSky
         bluetoothNeuroSky = BluetoothNeuroSky.getInstance(this);
         bluetoothNeuroSky.addEyeBlinkDataListener(this);
+        bluetoothNeuroSky.addAttentionDataListener(this);
+        bluetoothNeuroSky.addMeditationDataListener(this);
+        updateNeuroSkySettings();
 
         settingsActivity = new SettingsActivity();
         neuroSkyDetailsActivity = new NeuroSkyDetailsActivity();
@@ -139,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
         if (shouldRequestPermissions) {
             // Request the permissions
             ActivityCompat.requestPermissions(this, permissions, 1);
-            logger.log("Requesting permissions");
         } else {
             // All permissions already granted
             logger.log("All necessary permissions are already granted");
@@ -147,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
 
         // Check for the fine location permission.
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            logger.log("Permission not granted, please grant it");
+
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 1);
         } else {
             // Permission already granted, proceed with BLE scanning.
@@ -168,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
             } else if (result == -1) {
                 logger.log("Permission not granted, scan interrupted");
             } else if (result == 1) {
-                logger.log("Scanning started");
+                logger.log("[LOAD]Scanning started...");
             }
 
             startPeriodicScanning();
@@ -176,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
 
         Button settingsButton = findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(v -> {
+            logger.log("[LOAD]Loading Settings...");
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
@@ -287,6 +332,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
             // Open DeviceDetailsActivity with the device information and telemetry data
             if (deviceName.contains("NeuroSky"))
             {
+                logger.log("[LOAD]Loading NeuroSky device data...");
                 Intent intent = new Intent(MainActivity.this, NeuroSkyDetailsActivity.class);
                 intent.putExtra("DEVICE_ADDRESS", deviceAddress);
                 intent.putExtra("DEVICE_NAME", device.getName());
@@ -350,9 +396,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
             try {
                 oscClient.initialize(ipAddress, rxPort, txPort);
                 oscClient.setMessageListener((address, arguments) -> {
-                    Log.d("OSC", "Received message: " + address + " with arguments: " + arguments);
+                    //Log.d("OSC", "Received message: " + address + " with arguments: " + arguments);
                     runOnUiThread(() -> {
-                        // Handle the received message on the UI thread if needed
+                        // Handle the received message
                     });
                 });
             } catch (Exception e) {
@@ -584,17 +630,129 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
     public void updateNeuroSkySettings() {
         SharedPreferences preferences = getSharedPreferences(settingsActivity.PREFS_NAME, MODE_PRIVATE);
 
-        eyeBlinkOscAddressList = getMatchingStreamAddresses("EYE BLINK");
+        eyeBlinkOscAddressList = getMatchingStreamAddresses("NEUROSKY EYE BLINK");
         if (!eyeBlinkOscAddressList.isEmpty()) {
             eyeBlinkOscEnable = true;
         } else {
             eyeBlinkOscEnable = false;
         }
-        eyeBlinkReleaseTime      = preferences.getInt(neuroSkyDetailsActivity.BLINK_RELEASE_TIME_KEY, 100);
-        eyeBlinkUseIntegers      = preferences.getBoolean(neuroSkyDetailsActivity.BLINK_USE_INTEGERS_KEY, false);
-        eyeBlinkUseIntegersTrue  = preferences.getInt(neuroSkyDetailsActivity.BLINK_USE_INTEGERS_TRUE_KEY, 0);
-        eyeBlinkUseIntegersFalse = preferences.getInt(neuroSkyDetailsActivity.BLINK_USE_INTEGERS_FALSE_KEY, 1);
 
+        attentionOscAddressList = getMatchingStreamAddresses("NEUROSKY ATTENTION");
+        if (!attentionOscAddressList.isEmpty()) {
+            attentionOscEnable = true;
+        } else {
+            attentionOscEnable = false;
+        }
+
+        meditationOscAddressList = getMatchingStreamAddresses("NEUROSKY MEDITATION");
+        if (!meditationOscAddressList.isEmpty()) {
+            meditationOscEnable = true;
+        } else {
+            meditationOscEnable = false;
+        }
+
+        emotionTriggerOscAddressList = getMatchingStreamAddresses("NEUROSKY EMOTION");
+        if (!emotionTriggerOscAddressList.isEmpty()) {
+            emotionTriggerOscEnable = true;
+        } else {
+            emotionTriggerOscEnable = false;
+        }
+
+        for (int i = 0; i < neuroSkyDetailsActivity.ATTENTION_FIXED_X_POINTS; i++) {
+            float savedValue = preferences.getFloat(neuroSkyDetailsActivity.ATTENTION_INTERPOLATION_POINT_KEY + i, attentionInterpolationPointValues[i].floatValue());
+            attentionInterpolationPointValues[i] = savedValue;
+        }
+
+        for (int i = 0; i < neuroSkyDetailsActivity.MEDITATION_FIXED_X_POINTS; i++) {
+            float savedValue = preferences.getFloat(neuroSkyDetailsActivity.MEDITATION_INTERPOLATION_POINT_KEY + i, meditationInterpolationPointValues[i].floatValue());
+            meditationInterpolationPointValues[i] = savedValue;
+        }
+
+        eyeBlinkTriggerIntensityMin = preferences.getInt(neuroSkyDetailsActivity.BLINK_TRIGGER_INTENSITY_MIN_KEY, 0);
+        eyeBlinkTriggerIntensityMax = preferences.getInt(neuroSkyDetailsActivity.BLINK_TRIGGER_INTENSITY_MAX_KEY, 100);
+        eyeBlinkReleaseTime         = preferences.getInt(neuroSkyDetailsActivity.BLINK_RELEASE_TIME_KEY, 100);
+        eyeBlinkUseIntegers         = preferences.getBoolean(neuroSkyDetailsActivity.BLINK_USE_INTEGERS_KEY, false);
+        eyeBlinkUseIntegersTrue     = preferences.getInt(neuroSkyDetailsActivity.BLINK_USE_INTEGERS_TRUE_KEY, 0);
+        eyeBlinkUseIntegersFalse    = preferences.getInt(neuroSkyDetailsActivity.BLINK_USE_INTEGERS_FALSE_KEY, 1);
+        attentionFilterName         = preferences.getString(neuroSkyDetailsActivity.ATTENTION_FILTER_KEY, "SMOOTHING 4X");
+        meditationFilterName        = preferences.getString(neuroSkyDetailsActivity.MEDITATION_FILTER_KEY, "SMOOTHING 4X");
+        attentionTriggerEnable      = preferences.getBoolean(neuroSkyDetailsActivity.ATTENTION_TRIGGER_ENABLE_KEY, false);
+        attentionTriggerValue       = preferences.getInt(neuroSkyDetailsActivity.ATTENTION_TRIGGER_VALUE_KEY, 90);
+        attentionTriggerEmotionId   = preferences.getInt(neuroSkyDetailsActivity.ATTENTION_TRIGGER_EMOTION_ID_KEY, 0);
+        attentionTriggerStrength    = preferences.getInt(neuroSkyDetailsActivity.ATTENTION_TRIGGER_STRENGTH_KEY, 2);
+        meditationTriggerEnable     = preferences.getBoolean(neuroSkyDetailsActivity.MEDITATION_TRIGGER_ENABLE_KEY, false);
+        meditationTriggerValue      = preferences.getInt(neuroSkyDetailsActivity.MEDITATION_TRIGGER_VALUE_KEY, 90);
+        meditationTriggerEmotionId  = preferences.getInt(neuroSkyDetailsActivity.MEDITATION_TRIGGER_EMOTION_ID_KEY, 0);
+        meditationTriggerStrength   = preferences.getInt(neuroSkyDetailsActivity.MEDITATION_TRIGGER_STRENGTH_KEY, 2);
+
+        switch (attentionFilterName) {
+            case "SMOOTHING 2X":
+                attentionSmoothingValue = 2;
+                break;
+            case "SMOOTHING 4X":
+                attentionSmoothingValue = 4;
+                break;
+            case "SMOOTHING 8X":
+                attentionSmoothingValue = 8;
+                break;
+            case "SMOOTHING 16X":
+                attentionSmoothingValue = 16;
+                break;
+            case "SMOOTHING 32X":
+                attentionSmoothingValue = 32;
+                break;
+            default:
+                attentionSmoothingValue = 0;
+                break;
+        }
+
+        switch (meditationFilterName) {
+            case "SMOOTHING 2X":
+                meditationSmoothingValue = 2;
+                break;
+            case "SMOOTHING 4X":
+                meditationSmoothingValue = 4;
+                break;
+            case "SMOOTHING 8X":
+                meditationSmoothingValue = 8;
+                break;
+            case "SMOOTHING 16X":
+                meditationSmoothingValue = 16;
+                break;
+            case "SMOOTHING 32X":
+                meditationSmoothingValue = 32;
+                break;
+            default:
+                meditationSmoothingValue = 0;
+                break;
+        }
+
+        Log.d("MainActivity", "Smoothing Value For Attention: " + attentionSmoothingValue);
+
+        bluetoothNeuroSky.setEyeBlinkFilterParams(eyeBlinkTriggerIntensityMin, eyeBlinkTriggerIntensityMax, eyeBlinkReleaseTime);
+        if (attentionSmoothingValue > 0) {
+            bluetoothNeuroSky.setAttentionBufferSize(attentionSmoothingValue);
+        }
+        if (meditationSmoothingValue > 0) {
+            bluetoothNeuroSky.setMeditationBufferSize(meditationSmoothingValue);
+        }
+
+        Number[]  InterpolationPointValuesX = {0, 25, 50, 75, 100}; // Assume that we have 5 points with equal spacing
+        float[] floatInterpolationPointValuesX = new float[InterpolationPointValuesX.length];
+        float[] floatAttentionInterpolationPointValues = new float[attentionInterpolationPointValues.length];
+        float[] floatMeditationInterpolationPointValues = new float[meditationInterpolationPointValues.length];
+
+        for (int i = 0; i < InterpolationPointValuesX.length; i++) {
+            floatInterpolationPointValuesX[i] = InterpolationPointValuesX[i].floatValue();
+        }
+        for (int i = 0; i < attentionInterpolationPointValues.length; i++) {
+            floatAttentionInterpolationPointValues[i] = attentionInterpolationPointValues[i].floatValue();
+        }
+        for (int i = 0; i < meditationInterpolationPointValues.length; i++) {
+            floatMeditationInterpolationPointValues[i] = meditationInterpolationPointValues[i].floatValue();
+        }
+        bluetoothNeuroSky.setAttentionControlPoints(floatInterpolationPointValuesX, floatAttentionInterpolationPointValues);
+        bluetoothNeuroSky.setMeditationControlPoints(floatInterpolationPointValuesX, floatMeditationInterpolationPointValues);
     }
 
     private List<String> getMatchingStreamAddresses(String targetValue) {
@@ -623,13 +781,14 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
         @Override
         public void run() {
             SharedPreferences preferences = getSharedPreferences(settingsActivity.PREFS_NAME, MODE_PRIVATE);
-            Boolean settingsChanged = preferences.getBoolean(neuroSkyDetailsActivity.SETTINGS_UPDATE_FLAG, false);
-            if (settingsChanged) {
+            Boolean neuroskySettingsChanged = preferences.getBoolean(neuroSkyDetailsActivity.SETTINGS_UPDATE_FLAG, false);
+            Boolean settingsChanged = preferences.getBoolean(settingsActivity.SETTINGS_UPDATE_FLAG, false);
+            if (settingsChanged || neuroskySettingsChanged) {
                 updateNeuroSkySettings();
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean(neuroSkyDetailsActivity.SETTINGS_UPDATE_FLAG, false);
+                editor.putBoolean(settingsActivity.SETTINGS_UPDATE_FLAG, false);
                 editor.apply();
-                Log.d("MainActivity", "Updating settings");
             }
             updateSettingsHandler.postDelayed(this, 2000); // Repeat every 2 seconds
         }
@@ -641,9 +800,10 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
     /*======= NEUROSKY ACTIVITIES ========*/
     /*====================================*/
 
+
     @Override
     public void onEyeBlinkDataReceived(int blinkCount, int blinkIntensity) {
-        if (eyeBlinkOscEnable) {
+        if (eyeBlinkOscEnable && !emotionSet) {
             for (String address : eyeBlinkOscAddressList) {
                 List<Object> args;
                 if (!eyeBlinkUseIntegers) {
@@ -666,7 +826,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
                         } else {
                             args = Arrays.asList(eyeBlinkUseIntegersFalse);
                         }
-                        oscClient.sendMessage(address, args);
+                        if (!emotionSet) { //TODO: may cause stuck of eyelids in close position if address is differ from emotion trigger
+                            oscClient.sendMessage(address, args);
+                        }
                     }
                 }
             }, eyeBlinkReleaseTime);
@@ -674,6 +836,101 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
 
 
         Log.d("MainActivity", "Blink Count: " + blinkCount + " Blink Intensity: " + blinkIntensity + " eyeBlinkReleaseTime: " + eyeBlinkReleaseTime);
+    }
+
+    @Override
+    public void onAttentionDataReceived(int value) {
+        float currentAttention = value;
+        if (attentionSmoothingValue > 0) {
+            currentAttention = bluetoothNeuroSky.smoothAttentionValue(value);
+        }
+
+        // Interpolate the current attention value
+        float interpolatedAttention = bluetoothNeuroSky.interpolateAttention(currentAttention);
+        final float capturedAttention = currentAttention;
+
+        // Interpolation steps between the previous and current attention values
+        attentionHandler.removeCallbacksAndMessages(null); // Clear previous tasks
+        for (int i = 0; i <= smoothingSteps; i++) {
+            float stepValue = (previousAttentionValue + ((interpolatedAttention - previousAttentionValue) / smoothingSteps) * i) / 100.0f;
+            attentionHandler.postDelayed(() -> {
+                // Send OSC message
+                for (String address : attentionOscAddressList) {
+                    List<Object> args = Arrays.asList(stepValue);
+                    oscClient.sendMessage(address, args);
+                }
+
+                // Check and handle emotion trigger logic
+                if (emotionTriggerOscEnable) {
+                    for (String address : emotionTriggerOscAddressList) {
+                        if (attentionTriggerEnable) {
+                            attentionTriggered = bluetoothNeuroSky.checkAttentionTrigger(Math.round(capturedAttention), attentionTriggerValue, attentionTriggerStrength);
+                            List<Object> argsTrigger;
+                            if (attentionTriggered && !meditationTriggered) { // Meditation has higher priority
+                                emotionSet = true;
+                                argsTrigger = Arrays.asList(attentionTriggerEmotionId);
+                            } else if (!attentionTriggered && !meditationTriggered && emotionSet) {
+                                emotionSet = false;
+                                argsTrigger = Arrays.asList(0); // Reset emotion
+                            } else {
+                                continue;
+                            }
+                            oscClient.sendMessage(address, argsTrigger);
+                        }
+                    }
+                }
+            }, i * smoothingInterval);
+        }
+
+        previousAttentionValue = interpolatedAttention; // Update the previous value
+    }
+
+    @Override
+    public void onMeditationDataReceived(int value) {
+        float currentMeditation = value;
+        if (meditationSmoothingValue > 0) {
+            currentMeditation = bluetoothNeuroSky.smoothMeditationValue(value);
+        }
+
+
+        // Interpolate the current meditation value
+        float interpolatedMeditation = bluetoothNeuroSky.interpolateMeditation(currentMeditation);
+        final float capturedMeditation = currentMeditation;
+
+        // Interpolation steps between the previous and current meditation values
+        meditationHandler.removeCallbacksAndMessages(null); // Clear previous tasks
+        for (int i = 0; i <= smoothingSteps; i++) {
+            float stepValue = (previousMeditationValue + ((interpolatedMeditation - previousMeditationValue) / smoothingSteps) * i)/100.0f;
+            meditationHandler.postDelayed(() -> {
+                // Send OSC message
+                for (String address : meditationOscAddressList) {
+                    List<Object> args = Arrays.asList(stepValue);
+                    oscClient.sendMessage(address, args);
+                }
+
+                // Check and handle emotion trigger logic
+                if (emotionTriggerOscEnable) {
+                    for (String address : emotionTriggerOscAddressList) {
+                        if (meditationTriggerEnable) {
+                            meditationTriggered = bluetoothNeuroSky.checkMeditationTrigger(Math.round(capturedMeditation), meditationTriggerValue, meditationTriggerStrength);
+                            List<Object> argsTrigger;
+                            if (meditationTriggered) {  // Meditation has higher priority
+                                emotionSet = true;
+                                argsTrigger = Arrays.asList(meditationTriggerEmotionId);
+                            } else if (!meditationTriggered && !attentionTriggered && emotionSet) {
+                                emotionSet = false;
+                                argsTrigger = Arrays.asList(0); // Reset emotion
+                            } else {
+                                continue;
+                            }
+                            oscClient.sendMessage(address, argsTrigger);
+                        }
+                    }
+                }
+            }, i * smoothingInterval);
+        }
+
+        previousMeditationValue = interpolatedMeditation; // Update the previous value
     }
 
     @Override
@@ -689,6 +946,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothNeuroSky
     @Override
     protected void onResume() {
         Log.d("MainActivity", "Resuming");
+        logger.log("[LOAD OK]");
         super.onResume();
         registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter());
     }

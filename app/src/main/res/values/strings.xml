@@ -11,6 +11,19 @@
         <item>TSB2F</item>
         <item>TS</item>
         <item>TB</item>
-        <item>EYE BLINK</item>
+        <item>NEUROSKY EYE BLINK</item>
+        <item>NEUROSKY ATTENTION</item>
+        <item>NEUROSKY MEDITATION</item>
+        <item>NEUROSKY EMOTION</item>
     </string-array>
+
+    <string-array name="neurosky_filter_items">
+        <item>DISABLE</item>
+        <item>SMOOTHING 2X</item>
+        <item>SMOOTHING 4X</item>
+        <item>SMOOTHING 8X</item>
+        <item>SMOOTHING 16X</item>
+        <item>SMOOTHING 32X</item>
+    </string-array>
+
 </resources>

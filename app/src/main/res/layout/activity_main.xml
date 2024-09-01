@@ -44,6 +44,7 @@
 
             <TextView
                 android:id="@+id/DebugTerminal"
+                android:typeface="monospace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#FFBF00"

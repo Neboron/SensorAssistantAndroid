@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom style for NumberPicker -->
+    <style name="Aperture.NumberPicker" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:textColorPrimary">@color/aperture_term_main_st</item>
+        <item name="android:textColorSecondary">@color/aperture_term_main_st</item>
+        <item name="android:textColor">@color/aperture_term_main_st</item>
+        <item name="android:colorAccent">@color/aperture_term_main_st</item>
+    </style>
+</resources>

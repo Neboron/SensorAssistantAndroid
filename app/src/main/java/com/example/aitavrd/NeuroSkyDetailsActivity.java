@@ -4,14 +4,19 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.NumberPicker;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.ImageView;
@@ -46,6 +51,7 @@ import com.mohammedalaa.seekbar.OnDoubleValueSeekBarChangeListener;
 import com.mohammedalaa.seekbar.OnRangeSeekBarChangeListener;
 import com.mohammedalaa.seekbar.RangeSeekBarView;
 
+import java.lang.reflect.Field;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
@@ -68,6 +74,18 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
     public static final String BLINK_USE_INTEGERS_KEY = "blinkUseIntegers";
     public static final String BLINK_USE_INTEGERS_TRUE_KEY = "blinkUseIntegersTrue";
     public static final String BLINK_USE_INTEGERS_FALSE_KEY = "blinkUseIntegersFalse";
+    public static final String ATTENTION_FILTER_KEY = "attentionFilter";
+    public static final String MEDITATION_FILTER_KEY = "meditationFilter";
+    public static final String ATTENTION_INTERPOLATION_POINT_KEY = "attention_interpolation_point_";
+    public static final String MEDITATION_INTERPOLATION_POINT_KEY = "meditation_interpolation_point_";
+    public static final String ATTENTION_TRIGGER_ENABLE_KEY = "attentionTriggerEnable";
+    public static final String ATTENTION_TRIGGER_VALUE_KEY = "attentionTriggerValue";
+    public static final String ATTENTION_TRIGGER_EMOTION_ID_KEY = "attentionTriggerEmotionId";
+    public static final String ATTENTION_TRIGGER_STRENGTH_KEY = "attentionTriggerStrength";
+    public static final String MEDITATION_TRIGGER_ENABLE_KEY = "meditationTriggerEnable";
+    public static final String MEDITATION_TRIGGER_VALUE_KEY = "meditationTriggerValue";
+    public static final String MEDITATION_TRIGGER_EMOTION_ID_KEY = "meditationTriggerEmotionId";
+    public static final String MEDITATION_TRIGGER_STRENGTH_KEY = "meditationTriggerStrength";
 
     private ImageButton returnButton;
     private ImageView connectionStatusIcon;
@@ -85,10 +103,23 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
     private SwitchMaterial blinkUseIntegersSwitch;
     private EditText blinkUseIntegersTrueEditText;
     private EditText blinkUseIntegersFalseEditText;
+    private Spinner attentionFilterDropdownSpinner;
+    private Spinner meditationFilterDropdownSpinner;
     private ImageView interpolationDropdownIcon;
     private LinearLayout interpolationDropdownLayout;
     private XYPlot attentionInterpolationPlot;
     private XYPlot meditationInterpolationPlot;
+    private LinearLayout triggerSettingsDropdownLayout;
+    private LinearLayout triggerSettingsLayout;
+    private ImageView triggerSettingsDropdownIcon;
+    private SwitchMaterial attentionTriggerSwitch;
+    private NumberPicker attentionTriggerValuePicker;
+    private NumberPicker attentionTriggerEmotionIdPicker;
+    private NumberPicker attentionTriggerStrengthPicker;
+    private SwitchMaterial meditationTriggerSwitch;
+    private NumberPicker meditationTriggerValuePicker;
+    private NumberPicker meditationTriggerEmotionIdPicker;
+    private NumberPicker meditationTriggerStrengthPicker;
 
     private final Handler handler = new Handler();
     private static final int X_RANGE_RAW = 600;  // Number of data points displayed in the plot
@@ -101,7 +132,7 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
     // Variables for attention interpolation
     private boolean attentionPointBeingMoved = false; // Flag to track if a point is being moved
     private int attentionMovingPointIndex = -1;  // Tracks which point is being moved
-    private static final int ATTENTION_FIXED_X_POINTS = 5;  // Number of fixed x points
+    public static final int ATTENTION_FIXED_X_POINTS = 5;  // Number of fixed x points
     private Number[] attentionFixedValuesX = {1, 25, 50, 75, 99};  // Fixed x values
     private Number[] attentionPointValues = {0, 25, 50, 75, 100};  // Initial y values
     private SimpleXYSeries attentionMovableSeries;  // Series for movable points
@@ -110,7 +141,7 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
     // Variables for meditation interpolation
     private boolean meditationPointBeingMoved = false; // Flag to track if a point is being moved
     private int meditationMovingPointIndex = -1;  // Tracks which point is being moved
-    private static final int MEDITATION_FIXED_X_POINTS = 5;  // Number of fixed x points for meditation
+    public static final int MEDITATION_FIXED_X_POINTS = 5;  // Number of fixed x points for meditation
     private Number[] meditationFixedValuesX = {1, 25, 50, 75, 99};  // Fixed x values for meditation
     private Number[] meditationPointValues = {0, 25, 50, 75, 100};  // Initial y values for meditation
     private SimpleXYSeries meditationMovableSeries;  // Series for movable meditation points
@@ -151,10 +182,25 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         blinkUseIntegersSwitch           = findViewById(R.id.blinkUseIntegersSwitch);
         blinkUseIntegersTrueEditText     = findViewById(R.id.blinkUseIntegersTrueEditText);
         blinkUseIntegersFalseEditText    = findViewById(R.id.blinkUseIntegersFalseEditText);
+        attentionFilterDropdownSpinner   = findViewById(R.id.attentionFilterDropdownSpinner);
+        meditationFilterDropdownSpinner  = findViewById(R.id.meditationFilterDropdownSpinner);
         interpolationDropdownIcon        = findViewById(R.id.interpolationPlotDropdownIcon);
         interpolationDropdownLayout      = findViewById(R.id.interpolationPlotDropdownLayout);
         attentionInterpolationPlot       = findViewById(R.id.attentionInterpolationPlot);
         meditationInterpolationPlot      = findViewById(R.id.meditationInterpolationPlot);
+        triggerSettingsDropdownLayout    = findViewById(R.id.triggerSettingsDropdownLayout);
+        triggerSettingsLayout            = findViewById(R.id.triggerSettingsLayout);
+        triggerSettingsDropdownIcon      = findViewById(R.id.triggerSettingsDropdownIcon);
+        attentionTriggerSwitch           = findViewById(R.id.attentionTriggerSwitch);
+        attentionTriggerValuePicker      = findViewById(R.id.attentionTriggerValuePicker);
+        attentionTriggerEmotionIdPicker  = findViewById(R.id.attentionTriggerEmotionIdPicker);
+        attentionTriggerStrengthPicker   = findViewById(R.id.attentionTriggerStrengthPicker);
+        meditationTriggerSwitch          = findViewById(R.id.meditationTriggerSwitch);
+        meditationTriggerValuePicker     = findViewById(R.id.meditationTriggerValuePicker);
+        meditationTriggerEmotionIdPicker = findViewById(R.id.meditationTriggerEmotionIdPicker);
+        meditationTriggerStrengthPicker  = findViewById(R.id.meditationTriggerStrengthPicker);
+
+
 
 
 
@@ -167,6 +213,27 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         boolean savedBlinkUseIntegers        = preferences.getBoolean(BLINK_USE_INTEGERS_KEY, false);
         int savedBlinkUseIntegersTrue        = preferences.getInt(BLINK_USE_INTEGERS_TRUE_KEY, 1);
         int savedBlinkUseIntegersFalse       = preferences.getInt(BLINK_USE_INTEGERS_FALSE_KEY, 0);
+        String savedAttentionFilter          = preferences.getString(ATTENTION_FILTER_KEY, "DISABLE");
+        String savedMeditationFilter         = preferences.getString(MEDITATION_FILTER_KEY, "DISABLE");
+        boolean savedAttentionTrigger        = preferences.getBoolean(ATTENTION_TRIGGER_ENABLE_KEY, false);
+        int savedAttentionTriggerValue       = preferences.getInt(ATTENTION_TRIGGER_VALUE_KEY, 90);
+        int savedAttentionTriggerEmotionId   = preferences.getInt(ATTENTION_TRIGGER_EMOTION_ID_KEY, 0);
+        int savedAttentionTriggerStrength    = preferences.getInt(ATTENTION_TRIGGER_STRENGTH_KEY, 2);
+        boolean savedMeditationTrigger       = preferences.getBoolean(MEDITATION_TRIGGER_ENABLE_KEY, false);
+        int savedMeditationTriggerValue      = preferences.getInt(MEDITATION_TRIGGER_VALUE_KEY, 90);
+        int savedMeditationTriggerEmotionId  = preferences.getInt(MEDITATION_TRIGGER_EMOTION_ID_KEY, 0);
+        int savedMeditationTriggerStrength   = preferences.getInt(MEDITATION_TRIGGER_STRENGTH_KEY, 2);
+
+        for (int i = 0; i < ATTENTION_FIXED_X_POINTS; i++) {
+            float savedValue = preferences.getFloat(ATTENTION_INTERPOLATION_POINT_KEY + i, attentionPointValues[i].floatValue());
+            attentionPointValues[i] = savedValue;
+        }
+
+        for (int i = 0; i < MEDITATION_FIXED_X_POINTS; i++) {
+            float savedValue = preferences.getFloat(MEDITATION_INTERPOLATION_POINT_KEY + i, meditationPointValues[i].floatValue());
+            meditationPointValues[i] = savedValue;
+        }
+
 
 
         blinkRangeSeekBar.setCurrentMinValue(savedBlinkTriggerIntensityMin);
@@ -176,6 +243,16 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         blinkUseIntegersTrueEditText.setText(String.valueOf(savedBlinkUseIntegersTrue));
         blinkUseIntegersFalseEditText.setText(String.valueOf(savedBlinkUseIntegersFalse));
 
+        // Set up Spinners
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.neurosky_filter_items, R.layout.spinner_dropdown_item);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
+        attentionFilterDropdownSpinner.setAdapter(adapter);
+        meditationFilterDropdownSpinner.setAdapter(adapter);
+
+        // Set initial Spinner selection
+        setSpinnerSelection(attentionFilterDropdownSpinner, savedAttentionFilter);
+        setSpinnerSelection(meditationFilterDropdownSpinner, savedMeditationFilter);
 
         // Set initial track color
         updateTrackColor(blinkUseIntegersSwitch, savedBlinkUseIntegers);
@@ -206,7 +283,7 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         seriesRaw = new SimpleXYSeries("Raw Data");
         seriesAttention = new SimpleXYSeries("Attention");
         seriesMeditation = new SimpleXYSeries("Meditation");
-        attentionMovableSeries = new SimpleXYSeries(Arrays.asList(attentionFixedValuesX), Arrays.asList(attentionPointValues), "Movable Points");
+        attentionMovableSeries = new SimpleXYSeries(Arrays.asList(attentionFixedValuesX), Arrays.asList(attentionPointValues), "Attention Points");
         meditationMovableSeries = new SimpleXYSeries(Arrays.asList(meditationFixedValuesX), Arrays.asList(meditationPointValues), "Meditation Points");
         seriesRaw.useImplicitXVals();
         seriesAttention.useImplicitXVals();
@@ -238,6 +315,44 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         // Set up the dropdown layout
         LinearLayout rawDropdownLayout = findViewById(R.id.rawPlotDropdownLayout);
         ImageView dropdownIcon = findViewById(R.id.rawPlotDropdownIcon);
+
+
+        attentionTriggerSwitch.setChecked(savedAttentionTrigger);
+        // Set initial track color
+        updateTrackColor(attentionTriggerSwitch, savedAttentionTrigger);
+
+        meditationTriggerSwitch.setChecked(savedMeditationTrigger);
+        // Set initial track color
+        updateTrackColor(meditationTriggerSwitch, savedMeditationTrigger);
+
+        // Configure the range of values for the pickers
+        attentionTriggerValuePicker.setMinValue(50);
+        attentionTriggerValuePicker.setMaxValue(100);
+        attentionTriggerValuePicker.setValue(savedAttentionTriggerValue);
+
+        attentionTriggerEmotionIdPicker.setMinValue(0);
+        attentionTriggerEmotionIdPicker.setMaxValue(255);
+        attentionTriggerEmotionIdPicker.setValue(savedAttentionTriggerEmotionId);
+
+        attentionTriggerStrengthPicker.setMinValue(1);
+        attentionTriggerStrengthPicker.setMaxValue(10);
+        attentionTriggerStrengthPicker.setValue(savedAttentionTriggerStrength);
+
+        meditationTriggerValuePicker.setMinValue(50);
+        meditationTriggerValuePicker.setMaxValue(100);
+        meditationTriggerValuePicker.setValue(savedMeditationTriggerValue);
+
+        meditationTriggerEmotionIdPicker.setMinValue(0);
+        meditationTriggerEmotionIdPicker.setMaxValue(255);
+        meditationTriggerEmotionIdPicker.setValue(savedMeditationTriggerEmotionId);
+
+        meditationTriggerStrengthPicker.setMinValue(1);
+        meditationTriggerStrengthPicker.setMaxValue(10);
+        meditationTriggerStrengthPicker.setValue(savedMeditationTriggerStrength);
+
+
+
+        SharedPreferences.Editor editor = preferences.edit();
 
         rawDropdownLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +414,6 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
 
             @Override
             public void onStopTrackingTouch(@Nullable DoubleValueSeekBarView seekBar, int min, int max) {
-                SharedPreferences.Editor editor = preferences.edit();
                 SharedPreferences preferences   = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
                 editor.putInt(BLINK_TRIGGER_INTENSITY_MIN_KEY, min);
                 editor.putInt(BLINK_TRIGGER_INTENSITY_MAX_KEY, max);
@@ -322,7 +436,6 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
 
             @Override
             public void onStopTrackingTouch(@Nullable RangeSeekBarView seekBar, int time) {
-                SharedPreferences.Editor editor = preferences.edit();
 
                 editor.putInt(BLINK_RELEASE_TIME_KEY, (time*10));
                 editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
@@ -334,7 +447,6 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
 
         blinkUseIntegersSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // Save the state
-            SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean(BLINK_USE_INTEGERS_KEY, isChecked);
             editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
             editor.apply();
@@ -353,7 +465,6 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
 
         blinkUseIntegersTrueEditText.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                SharedPreferences.Editor editor = preferences.edit();
                 try {
                     int intValue = Integer.parseInt(blinkUseIntegersTrueEditText.getText().toString());
                     editor.putInt(BLINK_USE_INTEGERS_TRUE_KEY, intValue);
@@ -367,7 +478,6 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
 
         blinkUseIntegersFalseEditText.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                SharedPreferences.Editor editor = preferences.edit();
                 try {
                     int intValue = Integer.parseInt(blinkUseIntegersFalseEditText.getText().toString());
                     editor.putInt(BLINK_USE_INTEGERS_FALSE_KEY, intValue);
@@ -376,6 +486,34 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
                 }
                 editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
                 editor.apply();
+            }
+        });
+
+        attentionFilterDropdownSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                editor.putString(ATTENTION_FILTER_KEY, selectedItem);
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+                editor.apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        meditationFilterDropdownSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                editor.putString(MEDITATION_FILTER_KEY, selectedItem);
+                editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+                editor.apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
@@ -407,6 +545,78 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
             public boolean onTouch(View v, MotionEvent event) {
                 return handleMeditationTouch(event);
             }
+        });
+
+
+        triggerSettingsDropdownLayout.setOnClickListener(new View.OnClickListener() {
+            private boolean isTriggerSettingsVisible = false;
+
+            @Override
+            public void onClick(View v) {
+                if (isTriggerSettingsVisible) {
+                    triggerSettingsLayout.setVisibility(View.GONE);
+                    triggerSettingsDropdownIcon.setRotation(0);
+                } else {
+                    triggerSettingsLayout.setVisibility(View.VISIBLE);
+                    triggerSettingsDropdownIcon.setRotation(180);
+                }
+                isTriggerSettingsVisible = !isTriggerSettingsVisible;
+            }
+        });
+
+        attentionTriggerSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Save the state
+            editor.putBoolean(ATTENTION_TRIGGER_ENABLE_KEY, isChecked);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
+
+            // Update the track color
+            updateTrackColor(attentionTriggerSwitch, isChecked);
+        });
+
+        attentionTriggerValuePicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            editor.putInt(ATTENTION_TRIGGER_VALUE_KEY, newVal);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
+        });
+
+        attentionTriggerEmotionIdPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            editor.putInt(ATTENTION_TRIGGER_EMOTION_ID_KEY, newVal);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
+        });
+
+        attentionTriggerStrengthPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            editor.putInt(ATTENTION_TRIGGER_STRENGTH_KEY, newVal);
+            editor.apply();
+        });
+
+        meditationTriggerSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Save the state
+            editor.putBoolean(MEDITATION_TRIGGER_ENABLE_KEY, isChecked);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
+
+            // Update the track color
+            updateTrackColor(meditationTriggerSwitch, isChecked);
+        });
+
+        meditationTriggerValuePicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            editor.putInt(MEDITATION_TRIGGER_VALUE_KEY, newVal);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
+        });
+
+        meditationTriggerEmotionIdPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            editor.putInt(MEDITATION_TRIGGER_EMOTION_ID_KEY, newVal);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
+        });
+
+        meditationTriggerStrengthPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            editor.putInt(MEDITATION_TRIGGER_STRENGTH_KEY, newVal);
+            editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+            editor.apply();
         });
 
         checkConnectionHandler.postDelayed(checkConnectionRunnable, 1000);
@@ -770,7 +980,17 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                // Reset the index and allow parent view to intercept touch events again
+                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                if (attentionMovingPointIndex != -1) {
+                    // Save the updated values to shared preferences
+                    for (int i = 0; i < ATTENTION_FIXED_X_POINTS; i++) {
+                        editor.putFloat(ATTENTION_INTERPOLATION_POINT_KEY + i, attentionMovableSeries.getY(i).floatValue());
+                    }
+                    editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+                    editor.apply();
+                }
+
                 attentionMovingPointIndex = -1;
                 attentionPointBeingMoved = false;
                 attentionInterpolationPlot.getParent().requestDisallowInterceptTouchEvent(false);
@@ -810,7 +1030,17 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                // Reset the index and allow parent view to intercept touch events again
+                SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                if (meditationMovingPointIndex != -1) {
+                    // Save the updated values to shared preferences
+                    for (int i = 0; i < MEDITATION_FIXED_X_POINTS; i++) {
+                        editor.putFloat(MEDITATION_INTERPOLATION_POINT_KEY + i, meditationMovableSeries.getY(i).floatValue());
+                    }
+                    editor.putBoolean(SETTINGS_UPDATE_FLAG, true);
+                    editor.apply();
+                }
+
                 meditationMovingPointIndex = -1;
                 meditationPointBeingMoved = false;
                 meditationInterpolationPlot.getParent().requestDisallowInterceptTouchEvent(false);
@@ -868,6 +1098,16 @@ public class NeuroSkyDetailsActivity extends AppCompatActivity
         return nearestIndex;
     }
 
+
+    private void setSpinnerSelection(Spinner spinner, String value) {
+        ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) spinner.getAdapter();
+        if (adapter != null) {
+            int position = adapter.getPosition(value);
+            if (position >= 0) {
+                spinner.setSelection(position);
+            }
+        }
+    }
 
 
 

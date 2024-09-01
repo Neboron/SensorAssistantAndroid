@@ -25,6 +25,7 @@ public class OSC {
     private OSCMessageListener messageListener;
     private Thread singleMessageReceiveThread;
 
+    private boolean allowMessageSend = true;
 
     private int receivedMessageCount = 0;
     private int transmittedMessageCount = 0;
@@ -63,53 +64,65 @@ public class OSC {
     }
 
     public void sendMessage(String address, List<Object> arguments) {
-        Log.d(TAG, "Sending message to address: " + address + " with arguments: " + arguments);
-        sendHandler.post(() -> {
-            try {
-                ByteBuffer messageBuffer = ByteBuffer.allocate(1024); // Adjust size as needed
+        //Log.d(TAG, "Sending message to address: " + address + " with arguments: " + arguments);
+        if (allowMessageSend) {
+            sendHandler.post(() -> {
+                try {
+                    ByteBuffer messageBuffer = ByteBuffer.allocate(1024); // Adjust size as needed
 
-                // Add OSC address
-                addOSCString(messageBuffer, address);
+                    // Add OSC address
+                    addOSCString(messageBuffer, address);
 
-                // Add OSC type tag string
-                StringBuilder typeTagBuilder = new StringBuilder();
-                typeTagBuilder.append(',');
-                for (Object arg : arguments) {
-                    if (arg instanceof Integer) {
-                        typeTagBuilder.append('i');
-                    } else if (arg instanceof Float) {
-                        typeTagBuilder.append('f');
-                    } else if (arg instanceof String) {
-                        typeTagBuilder.append('s');
-                    } else if (arg instanceof Boolean) {
-                        typeTagBuilder.append((Boolean) arg ? 'T' : 'F');
+                    // Add OSC type tag string
+                    StringBuilder typeTagBuilder = new StringBuilder();
+                    typeTagBuilder.append(',');
+                    for (Object arg : arguments) {
+                        if (arg instanceof Integer) {
+                            typeTagBuilder.append('i');
+                        } else if (arg instanceof Float) {
+                            typeTagBuilder.append('f');
+                        } else if (arg instanceof String) {
+                            typeTagBuilder.append('s');
+                        } else if (arg instanceof Boolean) {
+                            typeTagBuilder.append((Boolean) arg ? 'T' : 'F');
+                        }
                     }
-                }
-                addOSCString(messageBuffer, typeTagBuilder.toString());
+                    addOSCString(messageBuffer, typeTagBuilder.toString());
 
-                // Add OSC arguments
-                for (Object arg : arguments) {
-                    if (arg instanceof Integer) {
-                        messageBuffer.putInt((Integer) arg);
-                    } else if (arg instanceof Float) {
-                        messageBuffer.putFloat((Float) arg);
-                    } else if (arg instanceof String) {
-                        addOSCString(messageBuffer, (String) arg);
+                    // Add OSC arguments
+                    for (Object arg : arguments) {
+                        if (arg instanceof Integer) {
+                            messageBuffer.putInt((Integer) arg);
+                        } else if (arg instanceof Float) {
+                            messageBuffer.putFloat((Float) arg);
+                        } else if (arg instanceof String) {
+                            addOSCString(messageBuffer, (String) arg);
+                        }
                     }
+
+                    byte[] messageBytes = new byte[messageBuffer.position()];
+                    messageBuffer.flip();
+                    messageBuffer.get(messageBytes);
+
+                    DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, this.address, outPort);
+                    sendSocket.send(packet);
+                    transmittedMessageCount++;
+                    Log.d(TAG, "OSC message sent: " + address + " with args: " + arguments);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error sending OSC message", e);
                 }
+            });
+        }
+    }
 
-                byte[] messageBytes = new byte[messageBuffer.position()];
-                messageBuffer.flip();
-                messageBuffer.get(messageBytes);
+    public void stopMessageSender() {
+        Log.d(TAG, "Stop sending messages, all sendMessage calls will be ignored!");
+        allowMessageSend = false;
+    }
 
-                DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length, this.address, outPort);
-                sendSocket.send(packet);
-                transmittedMessageCount++;
-                Log.d(TAG, "OSC message sent: " + address + " with args: " + arguments);
-            } catch (Exception e) {
-                Log.e(TAG, "Error sending OSC message", e);
-            }
-        });
+    public void resumeMessageSender() {
+        Log.d(TAG, "Resuming sending messages");
+        allowMessageSend = true;
     }
 
     private void addOSCString(ByteBuffer buffer, String str) {
